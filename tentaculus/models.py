@@ -28,13 +28,13 @@ class Distance(models.TextChoices):
 
 
 class Component(models.TextChoices):
-    V = 'В'
-    S = 'С'
-    M = 'М'
-    VS = 'В, С'
-    VM = 'В, М'
-    SM = 'С, М'
-    VSM = 'В, С, М'
+    V = 'V', 'В'
+    S = 'S', 'С'
+    M = 'M', 'М'
+    VS = 'VS', 'В, С'
+    VM = 'VM', 'В, М'
+    SM = 'SM', 'С, М'
+    VSM = 'VSM', 'В, С, М'
 
 
 class Duration(models.TextChoices):
