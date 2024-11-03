@@ -1,11 +1,14 @@
 from django.contrib import admin
 
 from tentaculus.models import (
+    Attunement,
     Book,
     CastTime,
     ClassRace,
     Distance,
     Duration,
+    Item,
+    ItemType,
     School,
     Spell,
 )
@@ -34,6 +37,15 @@ class ClassRaceAdmin(admin.ModelAdmin):
 class SchoolAdmin(admin.ModelAdmin):
     pass
 
+class ItemAdmin(admin.ModelAdmin):
+    pass
+
+class AttunementAdmin(admin.ModelAdmin):
+    pass
+
+class ItemTypeAdmin(admin.ModelAdmin):
+    pass
+
 
 admin.site.register(Spell, SpellAdmin)
 admin.site.register(Book, BookAdmin)
@@ -42,3 +54,6 @@ admin.site.register(Distance, DistanceAdmin)
 admin.site.register(Duration, DurationAdmin)
 admin.site.register(ClassRace, ClassRaceAdmin)
 admin.site.register(School, SchoolAdmin)
+admin.site.register(Item, ItemAdmin)
+admin.site.register(ItemType, ItemTypeAdmin)
+admin.site.register(Attunement, AttunementAdmin)

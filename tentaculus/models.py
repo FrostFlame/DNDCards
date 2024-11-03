@@ -23,10 +23,18 @@ class Component(models.TextChoices):
     SM = 'SM', 'С, М'
     VSM = 'VSM', 'В, С, М'
 
+class Rarity(models.TextChoices):
+    COMMON = 'common', 'Обычный'
+    UNCOMMON = 'uncommon', 'Необычный'
+    RARE = 'rare', 'Редкий'
+    VERY_RARE = 'very rare', 'Очень редкий'
+    LEGENDARY = 'legendary', 'Легендарный'
+    ARTIFACT = 'artifact', 'Артифакт'
+
 class Card(models.Model):
     title_eng = models.CharField(max_length=100)
-    title_font_size = models.DecimalField(max_digits=4, decimal_places=2)
     name = models.CharField(max_length=100)
+    name_font_size = models.DecimalField(max_digits=4, decimal_places=2)
     font_size = models.DecimalField(max_digits=4, decimal_places=2)
     description = models.TextField()
     footer_font_size = models.DecimalField(max_digits=4, decimal_places=2)
@@ -48,6 +56,15 @@ class Spell(Card):
     material_component = models.CharField(max_length=100)
     class_race = models.ManyToManyField('ClassRace', related_name='spells')
     school = models.ManyToManyField('School', related_name='spells')
+
+    def __str__(self):
+        return self.name
+
+
+class Item(Card):
+    attunement = models.ForeignKey('Attunement', on_delete=models.CASCADE)
+    item_type = models.ManyToManyField('ItemType', related_name='items')
+    rarity = models.TextField(choices=Rarity.choices)
 
     def __str__(self):
         return self.name
@@ -86,6 +103,18 @@ class ClassRace(models.Model):
         return self.name
 
 class School(models.Model):
+    name = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
+
+class Attunement(models.Model):
+    name = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
+
+class ItemType(models.Model):
     name = models.CharField(max_length=20)
 
     def __str__(self):
