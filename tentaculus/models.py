@@ -14,7 +14,6 @@ class Circle(models.IntegerChoices):
     EIGHTS = 8, '8'
     NINTH = 9, '9'
 
-
 class Component(models.TextChoices):
     V = 'V', 'В'
     S = 'S', 'С'
@@ -24,23 +23,8 @@ class Component(models.TextChoices):
     SM = 'SM', 'С, М'
     VSM = 'VSM', 'В, С, М'
 
-
-# class School(models.TextChoices):
-#     ABJURATION = 'Abjuration', 'Ограждение'
-#     BIOMANCY = 'Biomancy', 'Биомантия'
-#     CHRONOMANCY = 'Chronomancy', 'Хрономантия'
-#     CONJURATION = 'Conjuration', 'Вызов'
-#     DIVINATION = 'Divination', 'Прорицание'
-#     GRAVITURGY = 'Graviturgy', 'Гравитургия'
-#     ENCHANTMENT = 'Enchantment', 'Очарование'
-#     EVOCATION = 'Evocation', 'Воплощение'
-#     HEMOCRAFT = 'Hemocraft', 'Гемокрафт'
-#     NECROMANCY = 'Necromancy', 'Некромантия'
-#     TRANSMUTATION = 'Transmutatuion', 'Преобразование'
-
-
 class Card(models.Model):
-    title = models.CharField(max_length=100)
+    title_eng = models.CharField(max_length=100)
     title_font_size = models.DecimalField(max_digits=4, decimal_places=2)
     name = models.CharField(max_length=100)
     font_size = models.DecimalField(max_digits=4, decimal_places=2)
@@ -48,9 +32,11 @@ class Card(models.Model):
     footer_font_size = models.DecimalField(max_digits=4, decimal_places=2)
     book = models.ForeignKey('Book', on_delete=models.CASCADE)
 
-
     class Meta:
         abstract = True
+
+    def __str__(self):
+        return self.name
 
 
 class Spell(Card):
@@ -63,23 +49,44 @@ class Spell(Card):
     class_race = models.ManyToManyField('ClassRace', related_name='spells')
     school = models.ManyToManyField('School', related_name='spells')
 
+    def __str__(self):
+        return self.name
+
 
 class CastTime(models.Model):
     name = models.CharField(max_length=30)
 
+    def __str__(self):
+        return self.name
+
 class Distance(models.Model):
     name = models.CharField(max_length=30)
 
+    def __str__(self):
+        return self.name
+
 class Duration(models.Model):
     name = models.CharField(max_length=40)
+
+    def __str__(self):
+        return self.name
 
 class Book(models.Model):
     title = models.CharField(max_length=100)
     short = models.CharField(max_length=10)
 
+    def __str__(self):
+        return self.title
+
 class ClassRace(models.Model):
     name = models.CharField(max_length=20)
     style = models.CharField(max_length=20)
 
+    def __str__(self):
+        return self.name
+
 class School(models.Model):
     name = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
