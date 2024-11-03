@@ -34,10 +34,10 @@ class Rarity(models.TextChoices):
 class Card(models.Model):
     title_eng = models.CharField(max_length=100)
     name = models.CharField(max_length=100)
-    name_font_size = models.DecimalField(max_digits=4, decimal_places=2)
-    font_size = models.DecimalField(max_digits=4, decimal_places=2)
+    name_font_size = models.DecimalField(max_digits=4, decimal_places=2, null=True)
+    font_size = models.DecimalField(max_digits=4, decimal_places=2, null=True)
     description = models.TextField()
-    footer_font_size = models.DecimalField(max_digits=4, decimal_places=2)
+    footer_font_size = models.DecimalField(max_digits=4, decimal_places=2, null=True)
     book = models.ForeignKey('Book', on_delete=models.CASCADE)
 
     class Meta:
