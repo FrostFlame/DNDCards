@@ -15,18 +15,6 @@ class Circle(models.IntegerChoices):
     NINTH = 9, '9'
 
 
-class CastTime(models.TextChoices):
-    ACTION = 'action', '1 действие'
-    BONUS_ACTION = 'bonus action', '1 бонусное действие'
-    REACTION = 'reaction', '1 реакция'
-    MINUTES_10 = '10 minutes', '10 минут'
-
-
-class Distance(models.TextChoices):
-    SELF = 'self', 'На себя'
-    TOUCH = 'touch', 'Касание'
-
-
 class Component(models.TextChoices):
     V = 'V', 'В'
     S = 'S', 'С'
@@ -37,40 +25,28 @@ class Component(models.TextChoices):
     VSM = 'VSM', 'В, С, М'
 
 
-class Duration(models.TextChoices):
-    instant = 'instant', 'Мгновенно'
-    minute = '1 minute', '1 минута'
-
-
-class School(models.TextChoices):
-    ABJURATION = 'Ограждение'
-    BIOMANCY = 'Биомантия'
-    CHRONOMANCY = 'Хрономантия'
-    CONJURATION = 'Вызов'
-    DIVINATION = 'Прорицание'
-    GRAVITURGY = 'Гравитургия'
-    ENCHANTMENT = 'Очарование'
-    EVOCATION = 'Воплощение'
-    HEMOCRAFT = 'Гемокрафт'
-    NECROMANCY = 'Некромантия'
-    TRANSMUTATION = 'Преобразование'
-
-
-class Book(models.Model):
-    title = models.CharField(max_length=100)
-    short = models.CharField(max_length=10)
+# class School(models.TextChoices):
+#     ABJURATION = 'Abjuration', 'Ограждение'
+#     BIOMANCY = 'Biomancy', 'Биомантия'
+#     CHRONOMANCY = 'Chronomancy', 'Хрономантия'
+#     CONJURATION = 'Conjuration', 'Вызов'
+#     DIVINATION = 'Divination', 'Прорицание'
+#     GRAVITURGY = 'Graviturgy', 'Гравитургия'
+#     ENCHANTMENT = 'Enchantment', 'Очарование'
+#     EVOCATION = 'Evocation', 'Воплощение'
+#     HEMOCRAFT = 'Hemocraft', 'Гемокрафт'
+#     NECROMANCY = 'Necromancy', 'Некромантия'
+#     TRANSMUTATION = 'Transmutatuion', 'Преобразование'
 
 
 class Card(models.Model):
-    style = models.CharField(null=True, max_length=10)
     title = models.CharField(max_length=100)
     title_font_size = models.DecimalField(max_digits=4, decimal_places=2)
     name = models.CharField(max_length=100)
     font_size = models.DecimalField(max_digits=4, decimal_places=2)
     description = models.TextField()
-    source = models.CharField(max_length=20)
     footer_font_size = models.DecimalField(max_digits=4, decimal_places=2)
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    book = models.ForeignKey('Book', on_delete=models.CASCADE)
 
 
     class Meta:
@@ -79,9 +55,31 @@ class Card(models.Model):
 
 class Spell(Card):
     circle = models.IntegerField(choices=Circle.choices)
-    cast_time = models.TextField(choices=CastTime.choices)
-    distance = models.TextField(choices=Distance.choices)
+    cast_time = models.ForeignKey('CastTime', on_delete=models.CASCADE)
+    distance = models.ForeignKey('Distance', on_delete=models.CASCADE)
     components = models.TextField(choices=Component.choices)
-    duration = models.TextField(choices=Duration.choices)
+    duration = models.ForeignKey('Duration', on_delete=models.CASCADE)
     material_component = models.CharField(max_length=100)
-    school = models.TextField(choices=School.choices)
+    class_race = models.ManyToManyField('ClassRace', related_name='spells')
+    school = models.ManyToManyField('School', related_name='spells')
+
+
+class CastTime(models.Model):
+    name = models.CharField(max_length=30)
+
+class Distance(models.Model):
+    name = models.CharField(max_length=30)
+
+class Duration(models.Model):
+    name = models.CharField(max_length=40)
+
+class Book(models.Model):
+    title = models.CharField(max_length=100)
+    short = models.CharField(max_length=10)
+
+class ClassRace(models.Model):
+    name = models.CharField(max_length=20)
+    style = models.CharField(max_length=20)
+
+class School(models.Model):
+    name = models.CharField(max_length=20)
