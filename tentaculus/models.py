@@ -24,12 +24,12 @@ class Component(models.TextChoices):
     VSM = 'VSM', 'В, С, М'
 
 class Rarity(models.TextChoices):
-    COMMON = 'common', 'Обычный'
-    UNCOMMON = 'uncommon', 'Необычный'
-    RARE = 'rare', 'Редкий'
-    VERY_RARE = 'very rare', 'Очень редкий'
-    LEGENDARY = 'legendary', 'Легендарный'
-    ARTIFACT = 'artifact', 'Артифакт'
+    COMMON = 'Обычный', 'Обычный'
+    UNCOMMON = 'Необычный', 'Необычный'
+    RARE = 'Редкий', 'Редкий'
+    VERY_RARE =  'Очень редкий',  'Очень редкий'
+    LEGENDARY = 'Легендарный', 'Легендарный'
+    ARTIFACT = 'Артифакт', 'Артифакт'
 
 class Card(models.Model):
     title_eng = models.CharField(max_length=100)
@@ -65,12 +65,14 @@ class Spell(Card):
 class Item(Card):
     style = 'Item'
     attunement = models.ForeignKey('Attunement', on_delete=models.CASCADE)
-    item_type = models.ManyToManyField('ItemType', related_name='items')
+    item_types = models.ManyToManyField('ItemType', related_name='items')
     rarity = models.TextField(choices=Rarity.choices)
 
     def __str__(self):
         return self.name
 
+    def types(self):
+        return ', '.join([item_type.name for item_type in self.item_types.all()])
 
 class CastTime(models.Model):
     name = models.CharField(max_length=30)

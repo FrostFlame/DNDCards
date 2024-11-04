@@ -1,0 +1,26 @@
+<div class="cardContainer cardView {{card.style}}" style="width: 225px;">
+    <div class="spellCard">
+        <div class="content">
+            <h1 title="{{card.title}}" style="fontsize: {{card.name_font_size}}">{{card.name}}</h1>
+            <div class="row">
+                <div contenteditable="true" class="cell">
+                    <b>Настройка</b>
+                    <span>{{card.attunement}}</span>
+                </div>
+                <div contenteditable="true" class="cell">
+                    <b>Тип</b>
+                    <span>{{card.types}}</span>
+                </div>
+            </div>
+            <div contenteditable="true" class="text" style="font-size: {{card.font_size}}px;">
+                <p>
+                    {{card.description|safe}}
+                </p>
+            </div>
+            <b class="class" style="font-size: {{card.footer_font_size}}px">{{card.rarity}}</b>
+            <b class="school" style="font-size: {{card.footer_font_size}}px">
+                {{card.school}}<span title="{{card.book}}">({{card.book.short}})</span>
+            </b>
+        </div>
+    </div>
+</div>

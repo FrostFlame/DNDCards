@@ -163,43 +163,11 @@
 	<div class='p_cont' ref="cardContainer">
 		<div class="row spellContainer">
 			{% for card in cards %}
-			<div class="cardContainer cardView {{card.style}}" style="width: 225px;">
-				<div class="spellCard">
-					<div class="content">
-						<h1 title="{{card.title}}">{{card.circle}}. {{card.name}}</h1>
-						<div class="row">
-							<div contenteditable="true" class="cell">
-								<b>Накладывание</b>
-								<span>{{card.cast_time}}</span>
-							</div>
-							<div contenteditable="true" class="cell">
-								<b>Дистанция</b>
-								<span>{{card.distance}}</span>
-							</div>
-						</div>
-						<div class="row">
-							<div contenteditable="true" class="cell">
-								<b>Компоненты</b>
-								<span>{{card.components}}</span>
-							</div>
-							<div contenteditable="true" class="cell">
-								<b>Длительность</b>
-								<span>{{card.duration}}</span>
-							</div>
-						</div>
-						<div contenteditable="true" class="materials">{{card.material_components}}</div>
-						<div contenteditable="true" class="text" style="font-size: {{card.font_size}}px;">
-							<p>
-								{{card.description|safe}}
-							</p>
-						</div>
-						<b class="class" style="font-size: {{card.source_font_size}}px">{{card.source}}</b>
-						<b class="school" style="font-size: {{card.school_font_size}}px">
-							{{card.school}}<span title="{{card.book}}">({{card.book_short}})</span>
-						</b>
-					</div>
-				</div>
-			</div>
+				{% if card.style %}
+					{% include "tentaculus/item_card.html" %}
+				{% else %}
+					{% include "tentaculus/spell_card.html" %}
+				{% endif %}
 			{% endfor %}
 		</div>
 	</div>

@@ -1620,6 +1620,25 @@ p {
 .Wizard .spellCard .row .cell:last-of-type {
   border-left-color: #f44336;
 }
+.Item .spellCard {
+  background-color: grey;
+  border-color: grey;
+}
+.Item .spellCard h1 {
+  border-bottom-color: grey;
+}
+.Item .spellCard .materials {
+  background: grey !important;
+}
+.Item .spellCard .row {
+  border-bottom-color: grey;
+}
+.Item .spellCard .row .cell:first-of-type {
+  border-right-color: grey;
+}
+.Item .spellCard .row .cell:last-of-type {
+  border-left-color: grey;
+}
 .p_side {
   background: rgba(0, 0, 0, 0.4);
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
