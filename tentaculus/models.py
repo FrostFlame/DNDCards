@@ -39,6 +39,7 @@ class Card(models.Model):
     description = models.TextField()
     footer_font_size = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
     book = models.ForeignKey('Book', on_delete=models.CASCADE)
+    second_side = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
         abstract = True
@@ -62,6 +63,7 @@ class Spell(Card):
 
 
 class Item(Card):
+    style = 'Item'
     attunement = models.ForeignKey('Attunement', on_delete=models.CASCADE)
     item_type = models.ManyToManyField('ItemType', related_name='items')
     rarity = models.TextField(choices=Rarity.choices)
