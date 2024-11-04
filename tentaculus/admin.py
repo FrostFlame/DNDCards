@@ -1,8 +1,13 @@
 from django.contrib import admin
+from polymorphic.admin import (
+    PolymorphicParentModelAdmin,
+    PolymorphicChildModelAdmin, PolymorphicChildModelFilter,
+)
 
 from tentaculus.models import (
     Attunement,
     Book,
+    Card,
     CastTime,
     ClassRace,
     Distance,
@@ -16,44 +21,63 @@ from tentaculus.models import (
 
 # Register your models here.
 
-class SpellAdmin(admin.ModelAdmin):
-    pass
+class CardChildAdmin(PolymorphicChildModelAdmin):
+    base_model = Card
 
+
+@admin.register(Spell)
+class SpellAdmin(CardChildAdmin):
+    base_model = Spell
+    show_in_index = True
+
+
+@admin.register(Item)
+class ItemAdmin(CardChildAdmin):
+    base_model = Item
+    show_in_index = True
+
+
+@admin.register(Card)
+class CardParentAdmin(PolymorphicParentModelAdmin):
+    base_model = Card
+    child_models = (Spell, Item)
+    list_filter = (PolymorphicChildModelFilter,)
+
+
+@admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
     pass
 
+
+@admin.register(CastTime)
 class CastTimeAdmin(admin.ModelAdmin):
     pass
 
+
+@admin.register(Distance)
 class DistanceAdmin(admin.ModelAdmin):
     pass
 
+
+@admin.register(Duration)
 class DurationAdmin(admin.ModelAdmin):
     pass
 
+
+@admin.register(ClassRace)
 class ClassRaceAdmin(admin.ModelAdmin):
     pass
 
+
+@admin.register(School)
 class SchoolAdmin(admin.ModelAdmin):
     pass
 
-class ItemAdmin(admin.ModelAdmin):
-    pass
 
+@admin.register(Attunement)
 class AttunementAdmin(admin.ModelAdmin):
     pass
 
+@admin.register(ItemType)
 class ItemTypeAdmin(admin.ModelAdmin):
     pass
-
-
-admin.site.register(Spell, SpellAdmin)
-admin.site.register(Book, BookAdmin)
-admin.site.register(CastTime, CastTimeAdmin)
-admin.site.register(Distance, DistanceAdmin)
-admin.site.register(Duration, DurationAdmin)
-admin.site.register(ClassRace, ClassRaceAdmin)
-admin.site.register(School, SchoolAdmin)
-admin.site.register(Item, ItemAdmin)
-admin.site.register(ItemType, ItemTypeAdmin)
-admin.site.register(Attunement, AttunementAdmin)

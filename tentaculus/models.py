@@ -1,4 +1,6 @@
 from django.db import models
+from polymorphic.models import PolymorphicModel
+
 
 # Create your models here.
 
@@ -31,7 +33,7 @@ class Rarity(models.TextChoices):
     LEGENDARY = 'Легендарный', 'Легендарный'
     ARTIFACT = 'Артифакт', 'Артифакт'
 
-class Card(models.Model):
+class Card(PolymorphicModel):
     title_eng = models.CharField(max_length=100)
     name = models.CharField(max_length=100)
     name_font_size = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
@@ -40,9 +42,6 @@ class Card(models.Model):
     footer_font_size = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
     book = models.ForeignKey('Book', on_delete=models.CASCADE)
     second_side = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
-
-    class Meta:
-        abstract = True
 
     def __str__(self):
         return self.name
@@ -54,7 +53,7 @@ class Spell(Card):
     distance = models.ForeignKey('Distance', on_delete=models.CASCADE)
     components = models.TextField(choices=Component.choices)
     duration = models.ForeignKey('Duration', on_delete=models.CASCADE)
-    material_component = models.CharField(max_length=100)
+    material_component = models.CharField(max_length=100, null=True, blank=True)
     class_race = models.ManyToManyField('ClassRace', related_name='spells')
     school = models.ManyToManyField('School', related_name='spells')
 
