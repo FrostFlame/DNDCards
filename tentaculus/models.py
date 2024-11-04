@@ -17,13 +17,13 @@ class Circle(models.IntegerChoices):
     NINTH = 9, '9'
 
 class Component(models.TextChoices):
-    V = 'V', 'В'
-    S = 'S', 'С'
-    M = 'M', 'М'
-    VS = 'VS', 'В, С'
-    VM = 'VM', 'В, М'
-    SM = 'SM', 'С, М'
-    VSM = 'VSM', 'В, С, М'
+    V = 'В', 'В'
+    S = 'С', 'С'
+    M = 'М', 'М'
+    VS = 'В, С', 'В, С'
+    VM = 'В, М', 'В, М'
+    SM = 'С, М', 'С, М'
+    VSM = 'В, С, М', 'В, С, М'
 
 class Rarity(models.TextChoices):
     COMMON = 'Обычный', 'Обычный'
@@ -59,6 +59,9 @@ class Spell(Card):
 
     def __str__(self):
         return self.name
+
+    def get_school(self):
+        return self.school.all().order_by('priority')[0]
 
 
 class Item(Card):
@@ -105,8 +108,10 @@ class ClassRace(models.Model):
     def __str__(self):
         return self.name
 
+
 class School(models.Model):
     name = models.CharField(max_length=20)
+    priority = models.IntegerField()
 
     def __str__(self):
         return self.name

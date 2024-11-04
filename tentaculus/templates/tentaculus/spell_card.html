@@ -30,7 +30,7 @@
             </div>
             <b class="class" style="font-size: {{card.footer_font_size}}px">{{card.class_race.name}}</b>
             <b class="school" style="font-size: {{card.footer_font_size}}px">
-                {{card.school}}<span title="{{card.book}}">({{card.book_short}})</span>
+                {{card.get_school}} <span title="{{card.book}}">({{card.book.short}})</span>
             </b>
         </div>
     </div>
