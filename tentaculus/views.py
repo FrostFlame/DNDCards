@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from tentaculus.models import Item, Spell
+from tentaculus.models import Item, Spell, Card
 
 
 # Create your views here.
@@ -10,10 +10,9 @@ def all_cards(request):
     """
     Вообще все карты
     """
-    items = Item.objects.all()
-    spells = Spell.objects.all()
+    cards = Card.objects.filter(is_face_side=True)
     context = {
-        'cards': [*items, *spells]
+        'cards': cards
     }
     return render(request, 'cards.html', context)
 
@@ -22,7 +21,7 @@ def all_spells(request):
     """
     Все заклинания
     """
-    spells = Spell.objects.all()
+    spells = Spell.objects.filter(is_face_side=True)
     context = {
         'cards': spells
     }
@@ -33,7 +32,7 @@ def all_items(request):
     """
     Все предметы
     """
-    items = Item.objects.all()
+    items = Item.objects.filter(is_face_side=True)
     context = {
         'cards': items
     }
@@ -41,8 +40,8 @@ def all_items(request):
 
 
 def test(request):
-    cards = Item.objects.all()
+    cards = Card.objects.filter(is_face_side=True)
     context = {
-        'cards': cards
+        'cards': [card for card in cards]
     }
     return render(request, 'cards.html', context)

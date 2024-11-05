@@ -10,6 +10,14 @@
 				<i aria-hidden="true" class="fa fa-print"></i>
 			</a>
 		</div>
+		<div class="mediaWidth flexParent">
+			<a href="/spells" title="Spells" class="bt flexChild">
+				<i>Заклинания</i>
+			</a>
+			<a href="/items" title="Items" class="bt flexChild">
+				<i>Предметы</i>
+			</a>
+		</div>
 		<div class="mediaWidth">
 			<div id="NameInput">
 				<label for="sf_NameInput" class="filterLabel">Название</label>
@@ -18,7 +26,6 @@
 						<input id="sf_NameInput" type="text">
 						<span class="cross"></span>
 					</div>
-					<a href=#" id="bRandom" title="Случайное заклинание" class="bt flexChild">🎲</a>
 				</div>
 			</div>
 		</div>
@@ -167,6 +174,11 @@
 					{% include "tentaculus/item_card.html" %}
 				{% else %}
 					{% include "tentaculus/spell_card.html" %}
+				{% endif %}
+				{% if card.second_side and card.second_side.style %}
+					{% include "tentaculus/item_card.html" with card=card.second_side %}
+				{% elif card.second_side %}
+					{% include "tentaculus/spell_card.html" with card=card.second_side %}
 				{% endif %}
 			{% endfor %}
 		</div>

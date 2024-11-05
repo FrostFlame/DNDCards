@@ -42,6 +42,7 @@ class Card(PolymorphicModel):
     footer_font_size = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
     book = models.ForeignKey('Book', on_delete=models.CASCADE)
     second_side = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
+    is_face_side = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
@@ -61,7 +62,7 @@ class Spell(Card):
         return self.name
 
     def get_school(self):
-        return self.school.all().order_by('priority')[0]
+        return self.school.order_by('priority')[0]
 
 
 class Item(Card):

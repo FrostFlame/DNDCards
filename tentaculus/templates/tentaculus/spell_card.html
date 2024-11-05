@@ -1,7 +1,13 @@
 <div class="cardContainer cardView {{card.class_race.style}}" style="width: 225px;">
     <div class="spellCard">
         <div class="content">
-            <h1 title="{{card.title}}" style="font-size: {{card.name_font_size}}">{{card.circle}}. {{card.name}}</h1>
+            <h1 title="{{card.title_eng}}"
+                {% if card.name_font_size %}
+                    style="font-size: {{card.name_font_size}}px"
+                {% endif %}
+            >
+                {{card.circle}}. {{card.name}}
+            </h1>
             <div class="row">
                 <div contenteditable="true" class="cell">
                     <b>Накладывание</b>
@@ -22,14 +28,30 @@
                     <span>{{card.duration}}</span>
                 </div>
             </div>
-            <div contenteditable="true" class="materials">{{card.material_components}}</div>
-            <div contenteditable="true" class="text" style="font-size: {{card.font_size}}px;">
+            {% if card.material_components %}
+                <div contenteditable="true" class="materials">{{card.material_components}}</div>
+            {% endif %}
+            <div contenteditable="true" class="text"
+                {% if card.font_size %}
+                    style="font-size: {{card.font_size}}px;"
+                {% endif %}
+            >
                 <p>
                     {{card.description|safe}}
                 </p>
             </div>
-            <b class="class" style="font-size: {{card.footer_font_size}}px">{{card.class_race.name}}</b>
-            <b class="school" style="font-size: {{card.footer_font_size}}px">
+            <b class="class"
+                {% if card.footer_font_size %}
+                    style="font-size: {{card.footer_font_size}}px"
+                {% endif %}
+            >
+                {{card.class_race.name}}
+            </b>
+            <b class="school"
+                {% if card.footer_font_size %}
+                    style="font-size: {{card.footer_font_size}}px"
+                {% endif %}
+            >
                 {{card.get_school}} <span title="{{card.book}}">({{card.book.short}})</span>
             </b>
         </div>
