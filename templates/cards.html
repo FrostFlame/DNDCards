@@ -19,7 +19,7 @@
 				<i>Предметы</i>
 			</a>
 		</div>
-		<form action="/search/" method="get">
+		<form id='search-form' action="/search/" method="get">
 			<div class="mediaWidth">
 				<div id="NameInput">
 					<label class="filterLabel">{{ form.name.label }}</label>
@@ -38,30 +38,17 @@
 					</div>
 				</div>
 			</div>
+			<div class="mediaWidth">
+			<div id="SubClassSelect">
+				<div class="customSelect">
+					{{ form.subclass }}
+				</div>
+			</div>
+		</div>
 			<input class="btn" type="submit" value="Поиск" />
 		</form>
 
 
-		<div class="mediaWidth">
-			<div id="ClassSelect">
-				<label class="filterLabel">Класс</label>
-				<div class="customSelect">
-					<div class="label">[ВСЕ]</div>
-					<ul class="list" style="display: none;">
-						<li class="option">[ВСЕ]</li>
-						<li class="option">Artificer<br>Изобретатель</li>
-						<li class="option">Bard<br>Бард</li>
-						<li class="option">Cleric<br>Жрец</li>
-						<li class="option">Druid<br>Друид</li>
-						<li class="option">Paladin<br>Паладин</li>
-						<li class="option">Ranger<br>Рейнджер</li>
-						<li class="option">Sorcerer<br>Чародей</li>
-						<li class="option">Warlock<br>Колдун</li>
-						<li class="option">Wizard<br>Волшебник</li>
-					</ul>
-				</div>
-			</div>
-		</div>
 		<div class="mediaWidth">
 			<div id="SubClassSelect">
 				<div class="customSelect">
@@ -197,4 +184,22 @@
 		</div>
 	</div>
 </div>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+	$("#id_dnd_class").change(function () {
+		var classId = $(this).val();
+
+		$.ajax({
+			url: '/ajax-subclasses',
+			data: {
+				'class': classId
+			},
+			success: function (data) {
+				console.log(data);
+				$("#id_subclass").html(data);
+			}
+		});
+
+	});
+</script>
 {% endblock %}

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 from tentaculus.forms import SearchForm
-from tentaculus.models import Item, Spell, Card
+from tentaculus.models import Item, Spell, Card, DndClass
 
 
 # Create your views here.
@@ -69,6 +69,12 @@ def search(request):
     }
 
     return render(request, 'cards.html', context)
+
+
+def load_subclasses(request):
+    class_id = request.GET.get('class')
+    subclasses = DndClass.objects.get(id=class_id).subclasses.all()
+    return render(request, 'tentaculus/subclasses.html', {'subclasses': subclasses})
 
 
 def test(request):
