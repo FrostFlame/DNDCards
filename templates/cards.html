@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load custom_filters %}
 {% block content %}
 <div id="app" class="wrap">
 	<div class="p_side">
@@ -18,17 +19,19 @@
 				<i>Предметы</i>
 			</a>
 		</div>
-		<div class="mediaWidth">
-			<div id="NameInput">
-				<label for="sf_NameInput" class="filterLabel">Название</label>
-				<div style="display: flex;">
-					<div class="customInput">
-						<input id="sf_NameInput" type="text">
-						<span class="cross"></span>
+		<form action="/search/" method="get">
+			<div class="mediaWidth">
+				<div id="NameInput">
+					<label class="filterLabel">{{ form.name.label }}</label>
+					<div style="display: flex;">
+						<div class="customInput">
+							{{ form.name }}
+							<span class="cross"></span>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
+		</form>
 		<div class="mediaWidth">
 			<div id="ClassSelect">
 				<label class="filterLabel">Класс</label>

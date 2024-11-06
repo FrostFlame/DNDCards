@@ -33,6 +33,7 @@ class Rarity(models.TextChoices):
     LEGENDARY = 'Легендарный', 'Легендарный'
     ARTIFACT = 'Артифакт', 'Артифакт'
 
+
 class Card(PolymorphicModel):
     title_eng = models.CharField(max_length=100)
     name = models.CharField(max_length=100)
@@ -55,7 +56,7 @@ class Spell(Card):
     components = models.TextField(choices=Component.choices)
     duration = models.ForeignKey('Duration', on_delete=models.CASCADE)
     material_component = models.CharField(max_length=100, null=True, blank=True)
-    class_race = models.ManyToManyField('ClassRace', related_name='spells')
+    class_race = models.ManyToManyField('Source')
     school = models.ManyToManyField('School', related_name='spells')
 
     def __str__(self):
@@ -102,13 +103,23 @@ class Book(models.Model):
     def __str__(self):
         return self.title
 
-class ClassRace(models.Model):
+class Source(PolymorphicModel):
     name = models.CharField(max_length=20)
-    style = models.CharField(max_length=20)
 
     def __str__(self):
         return self.name
 
+class DndClass(Source):
+    style = models.CharField(max_length=20, null=True, blank=True)
+
+class SubClass(Source):
+    base_class = models.ForeignKey(DndClass, related_name='subclasses', on_delete=models.CASCADE, blank=True, null=True)
+
+class Race(Source):
+    style = models.CharField(max_length=20, null=True, blank=True)
+
+class SubRace(Source):
+    base_race = models.ForeignKey(Race, related_name='subraces', on_delete=models.CASCADE, blank=True, null=True)
 
 class School(models.Model):
     name = models.CharField(max_length=20)

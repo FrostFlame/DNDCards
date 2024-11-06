@@ -1,7 +1,8 @@
 from django.contrib import admin
 from polymorphic.admin import (
     PolymorphicParentModelAdmin,
-    PolymorphicChildModelAdmin, PolymorphicChildModelFilter,
+    PolymorphicChildModelAdmin,
+    PolymorphicChildModelFilter,
 )
 
 from tentaculus.models import (
@@ -9,13 +10,17 @@ from tentaculus.models import (
     Book,
     Card,
     CastTime,
-    ClassRace,
     Distance,
+    DndClass,
     Duration,
     Item,
     ItemType,
+    Race,
     School,
+    Source,
     Spell,
+    SubClass,
+    SubRace,
 )
 
 
@@ -44,6 +49,41 @@ class CardParentAdmin(PolymorphicParentModelAdmin):
     list_filter = (PolymorphicChildModelFilter,)
 
 
+class SourceChildAdmin(PolymorphicChildModelAdmin):
+    base_model = Source
+
+
+@admin.register(DndClass)
+class DndClassAdmin(SourceChildAdmin):
+    base_model = DndClass
+    show_in_index = True
+
+
+@admin.register(SubClass)
+class SubClassAdmin(SourceChildAdmin):
+    base_model = SubClass
+    show_in_index = True
+
+
+@admin.register(Race)
+class RaceAdmin(SourceChildAdmin):
+    base_model = Race
+    show_in_index = True
+
+
+@admin.register(SubRace)
+class SubRaceAdmin(SourceChildAdmin):
+    base_model = SubRace
+    show_in_index = True
+
+
+@admin.register(Source)
+class SourceParentAdmin(PolymorphicParentModelAdmin):
+    base_model = Source
+    child_models = (DndClass, SubClass, Race, SubRace)
+    list_filter = (PolymorphicChildModelFilter,)
+
+
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
     pass
@@ -61,11 +101,6 @@ class DistanceAdmin(admin.ModelAdmin):
 
 @admin.register(Duration)
 class DurationAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(ClassRace)
-class ClassRaceAdmin(admin.ModelAdmin):
     pass
 
 
