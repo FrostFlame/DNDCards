@@ -26,12 +26,22 @@
 					<div style="display: flex;">
 						<div class="customInput">
 							{{ form.name }}
-							<span class="cross"></span>
 						</div>
 					</div>
 				</div>
 			</div>
+			<div class="mediaWidth">
+				<div id="ClassSelect">
+					<label class="filterLabel">{{ form.dnd_class.label }}</label>
+					<div>
+						{{ form.dnd_class }}
+					</div>
+				</div>
+			</div>
+			<input class="btn" type="submit" value="Поиск" />
 		</form>
+
+
 		<div class="mediaWidth">
 			<div id="ClassSelect">
 				<label class="filterLabel">Класс</label>

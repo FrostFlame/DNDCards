@@ -12,7 +12,7 @@ def all_cards(request):
     Вообще все карты
     """
 
-    form = SearchForm()
+    form = SearchForm(request.GET)
 
     cards = Card.objects.filter(is_face_side=True)
     context = {
@@ -27,7 +27,7 @@ def all_spells(request):
     Все заклинания
     """
 
-    form = SearchForm()
+    form = SearchForm(request.GET)
 
     spells = Spell.objects.filter(is_face_side=True)
     context = {
@@ -42,7 +42,7 @@ def all_items(request):
     Все предметы
     """
 
-    form = SearchForm()
+    form = SearchForm(request.GET)
 
     items = Item.objects.filter(is_face_side=True)
     context = {
@@ -58,8 +58,11 @@ def search(request):
     """
 
     form = SearchForm(request.GET)
-
-    cards = Card.objects.filter(is_face_side=True, name__icontains=request.GET.get('name'))
+    dnd_class = request.GET.get('dnd_class')
+    if dnd_class:
+        cards = Spell.objects.filter(is_face_side=True, name__icontains=request.GET.get('name'), class_race=dnd_class)
+    else:
+        cards = Card.objects.filter(is_face_side=True, name__icontains=request.GET.get('name'))
     context = {
         'cards': cards,
         'form': form,
