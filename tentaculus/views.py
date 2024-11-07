@@ -1,7 +1,8 @@
+from django.db.models.query_utils import subclasses
 from django.shortcuts import render
 
 from tentaculus.forms import SearchForm
-from tentaculus.models import Item, Spell, Card, DndClass
+from tentaculus.models import Item, Spell, Card, DndClass, SubClass
 
 
 # Create your views here.
@@ -59,8 +60,15 @@ def search(request):
 
     form = SearchForm(request.GET)
     dnd_class = request.GET.get('dnd_class')
+    subclass = request.GET.get('subclass')
     if dnd_class:
-        cards = Spell.objects.filter(is_face_side=True, name__icontains=request.GET.get('name'), class_race=dnd_class)
+        form.fields['subclass'].queryset = DndClass.objects.get(id=dnd_class).subclasses.all()
+        form.fields['subclass'].initial = subclass
+        cards = Spell.objects.filter(is_face_side=True, name__icontains=request.GET.get('name'))
+        if subclass:
+            cards = cards.filter(class_race=subclass)
+        else:
+            cards = cards.filter(class_race=dnd_class)
     else:
         cards = Card.objects.filter(is_face_side=True, name__icontains=request.GET.get('name'))
     context = {
