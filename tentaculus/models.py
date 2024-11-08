@@ -51,6 +51,7 @@ class Card(PolymorphicModel):
 
 class Spell(Card):
     circle = models.IntegerField(choices=Circle.choices)
+    is_ritual = models.BooleanField(default=False)
     cast_time = models.ForeignKey('CastTime', on_delete=models.CASCADE)
     distance = models.ForeignKey('Distance', on_delete=models.CASCADE)
     components = models.TextField(choices=Component.choices)
@@ -114,6 +115,9 @@ class DndClass(Source):
 
 class SubClass(Source):
     base_class = models.ForeignKey(DndClass, related_name='subclasses', on_delete=models.CASCADE, blank=True, null=True)
+
+    def style(self):
+        return self.base_class.style
 
 class Race(Source):
     style = models.CharField(max_length=20, null=True, blank=True)

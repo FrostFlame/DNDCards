@@ -1,4 +1,4 @@
-<div class="cardContainer cardView {{card.class_race.style}}" style="width: 225px;">
+<div class="cardContainer cardView {{card.class_race.all.0.style}}" style="width: 225px;">
     <div class="spellCard">
         <div class="content">
             <h1 title="{{card.title_eng}}"
@@ -6,7 +6,7 @@
                     style="font-size: {{card.name_font_size}}px"
                 {% endif %}
             >
-                {{card.circle}}. {{card.name}}
+                {{card.circle}}. {{card.name}} {% if card.is_ritual %}(Ритуал) {% endif %}
             </h1>
             <div class="row">
                 <div contenteditable="true" class="cell">
@@ -45,7 +45,7 @@
                     style="font-size: {{card.footer_font_size}}px"
                 {% endif %}
             >
-                {{card.class_race.name}}
+                {{card.class_race.all.0}}
             </b>
             <b class="school"
                 {% if card.footer_font_size %}

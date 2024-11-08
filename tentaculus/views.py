@@ -1,8 +1,9 @@
+from django.db.models import Prefetch
 from django.db.models.query_utils import subclasses
 from django.shortcuts import render
 
 from tentaculus.forms import SearchForm
-from tentaculus.models import Item, Spell, Card, DndClass, SubClass
+from tentaculus.models import Item, Spell, Card, DndClass, SubClass, Source
 
 
 # Create your views here.
@@ -62,15 +63,25 @@ def search(request):
     dnd_class = request.GET.get('dnd_class')
     subclass = request.GET.get('subclass')
     if dnd_class:
-        form.fields['subclass'].queryset = DndClass.objects.get(id=dnd_class).subclasses.all()
+        chosen_class = DndClass.objects.get(id=dnd_class)
+        form.fields['subclass'].queryset = chosen_class.subclasses.all()
         form.fields['subclass'].initial = subclass
-        cards = Spell.objects.filter(is_face_side=True, name__icontains=request.GET.get('name'))
+
         if subclass:
-            cards = cards.filter(class_race=subclass)
+            cards = Spell.objects.filter(is_face_side=True, name__icontains=request.GET.get('name')).prefetch_related(
+                Prefetch('class_race', queryset=Source.objects.filter(id__in=(dnd_class, subclass)))
+            )
         else:
-            cards = cards.filter(class_race=dnd_class)
+            cards = Spell.objects.filter(is_face_side=True, name__icontains=request.GET.get('name')).prefetch_related(
+                Prefetch('class_race', queryset=Source.objects.filter(id=dnd_class))
+            )
     else:
         cards = Card.objects.filter(is_face_side=True, name__icontains=request.GET.get('name'))
+
+    if subclass:
+        cards = cards.filter(class_race__in=(dnd_class, subclass))
+    else:
+        cards = cards.filter(class_race=dnd_class)
     context = {
         'cards': cards,
         'form': form,
