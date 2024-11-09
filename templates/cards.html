@@ -3,6 +3,7 @@
 {% block content %}
 <div id="app" class="wrap">
 	<div class="p_side">
+
 		<div class="mediaWidth flexParent">
 			<a href="/" title="На главную страницу" class="bt flexChild">
 				<i class="fa fa-home"></i>
@@ -11,6 +12,7 @@
 				<i aria-hidden="true" class="fa fa-print"></i>
 			</a>
 		</div>
+
 		<div class="mediaWidth flexParent">
 			<a href="/spells" title="Spells" class="bt flexChild">
 				<i>Заклинания</i>
@@ -19,6 +21,7 @@
 				<i>Предметы</i>
 			</a>
 		</div>
+
 		<form id='search-form' action="/search/" method="get">
 			<div class="mediaWidth">
 				<div id="NameInput">
@@ -30,6 +33,7 @@
 					</div>
 				</div>
 			</div>
+
 			<div class="mediaWidth">
 				<div id="ClassSelect">
 					<label class="filterLabel">{{ form.dnd_class.label }}</label>
@@ -38,59 +42,40 @@
 					</div>
 				</div>
 			</div>
+
 			<div class="mediaWidth">
-			<div id="SubClassSelect">
-				<label class="filterLabel">{{ form.subclass.label }}</label>
-				<div class="customSelect">
-					{{ form.subclass }}
+				<div id="SubClassSelect">
+					<label class="filterLabel">{{ form.subclass.label }}</label>
+					<div class="customSelect">
+						{{ form.subclass }}
+					</div>
 				</div>
 			</div>
-		</div>
+
+			<div class="mediaWidth">
+				<label class="filterLabel">Уровень с/по</label>
+				<div class="row">
+					<div class="cell">
+						<div id="LevelSelectStart">
+							<div class="customSelect">
+								{{ form.circle_from }}
+							</div>
+						</div>
+					</div>
+					<div class="cell">
+						<div id="LevelSelectEnd">
+							<div class="customSelect">
+								{{ form.circle_to }}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<input class="btn" type="submit" value="Поиск" />
 		</form>
 
 
-		<div class="mediaWidth">
-			<div id="SubClassSelect">
-				<div class="customSelect">
-					<div class="label">
-						[ПОДКЛАСС]
-					</div>
-					<ul class="list" style="display: none;">
-						<li class="option">
-							[ПОДКЛАСС]
-						</li>
-						<li class="option">Knowlege Domain<br>Домен Знаний</li>
-						<li class="option">Life Domain<br>Домен Жизни</li>
-						<li class="option">Lite Domain<br>Домен Света</li>
-						<li class="option">Nature Domain<br>Домен Природы</li>
-						<li class="option">Tempest Domain<br>Домен Бури</li>
-						<li class="option">Trickery Domain<br>Домен Обмана</li>
-						<li class="option">War Domain<br>Домен Войны</li>
-						<li class="option">Forge Domain<br>Домен Кузни</li>
-						<li class="option">Grave Domain<br>Домен Упокоения</li>
-					</ul>
-				</div>
-			</div>
-		</div>
-		<div class="mediaWidth" style="display: none;">
-			<div id="SubSubClassSelect">
-				<div class="customSelect">
-					<div class="label">
-						[ПОДПОДКЛАСС]
-					</div>
-					<ul class="list" style="display: none;">
-						<li class="option">[ПОДПОДКЛАСС]</li>
-					</ul>
-				</div>
-			</div>
-		</div>
-		<div class="mediaWidth">
-			<div id="RitualCheckbox" title="Все заклинания из этого справочника, которые могут  применять представители класса, включая все архетпы" class="customCheckbox">
-				<input type="checkbox" id="chb_RitualCheckbox">
-				<span class="label">Все заклинания класса</span>
-			</div>
-		</div>
 		<div class="mediaWidth">
 			<label class="filterLabel">Уровень с/по</label>
 			<div class="row">

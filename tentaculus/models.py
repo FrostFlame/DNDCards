@@ -5,6 +5,7 @@ from polymorphic.models import PolymorphicModel
 # Create your models here.
 
 class Circle(models.IntegerChoices):
+    INITIAL = -1, '---'
     CANTRIP = 0, 'Заговор'
     FIRST = 1, '1'
     SECOND = 2, '2'

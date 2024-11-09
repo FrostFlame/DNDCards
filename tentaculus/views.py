@@ -3,7 +3,7 @@ from django.db.models.query_utils import subclasses
 from django.shortcuts import render
 
 from tentaculus.forms import SearchForm
-from tentaculus.models import Item, Spell, Card, DndClass, SubClass, Source
+from tentaculus.models import Item, Spell, Card, DndClass, SubClass, Source, Circle
 
 
 # Create your views here.
@@ -29,7 +29,7 @@ def all_spells(request):
     Все заклинания
     """
 
-    form = SearchForm(request.GET)
+    form = SearchForm(request.GET, initial={'circle_to': Circle.NINTH})
 
     spells = Spell.objects.filter(is_face_side=True)
     context = {
@@ -62,26 +62,38 @@ def search(request):
     form = SearchForm(request.GET)
     dnd_class = request.GET.get('dnd_class')
     subclass = request.GET.get('subclass')
-    if dnd_class:
-        chosen_class = DndClass.objects.get(id=dnd_class)
-        form.fields['subclass'].queryset = chosen_class.subclasses.all()
-        form.fields['subclass'].initial = subclass
+    circle_from = int(request.GET.get('circle_from'))
+    circle_to = int(request.GET.get('circle_to'))
 
+    if dnd_class or (circle_from >=0 and circle_to >= 0):
+        ### Блок обработки заклинаний
+        cards = Spell.objects.filter(is_face_side=True, name__icontains=request.GET.get('name'))
         if subclass:
-            cards = Spell.objects.filter(is_face_side=True, name__icontains=request.GET.get('name')).prefetch_related(
+            ### Если известен сабкласс
+            cards = cards.prefetch_related(
                 Prefetch('class_race', queryset=Source.objects.filter(id__in=(dnd_class, subclass)))
-            )
-        else:
-            cards = Spell.objects.filter(is_face_side=True, name__icontains=request.GET.get('name')).prefetch_related(
+            ).filter(class_race__in=(dnd_class, subclass))
+
+            form.fields['subclass'].initial = subclass
+        elif dnd_class:
+            ### Если известен класс
+            cards = cards.prefetch_related(
                 Prefetch('class_race', queryset=Source.objects.filter(id=dnd_class))
-            )
+            ).filter(class_race=dnd_class)
+
+            class_object = DndClass.objects.get(id=dnd_class)
+            form.fields['subclass'].queryset = class_object.subclasses.all()
+        else:
+            ### Все классы
+            pass
+
+        if circle_from >=0 and circle_to >= 0:
+            cards = cards.filter(circle__gte=circle_from, circle__lte=circle_to)
+
     else:
+        ### Блок обработки всего вместе
         cards = Card.objects.filter(is_face_side=True, name__icontains=request.GET.get('name'))
 
-    if subclass:
-        cards = cards.filter(class_race__in=(dnd_class, subclass))
-    else:
-        cards = cards.filter(class_race=dnd_class)
     context = {
         'cards': cards,
         'form': form,
