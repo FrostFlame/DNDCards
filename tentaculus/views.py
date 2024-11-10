@@ -1,5 +1,5 @@
 from django.db.models import Prefetch
-from django.db.models.query_utils import subclasses
+from django.db.models.query_utils import subclasses, Q
 from django.shortcuts import render
 
 from tentaculus.forms import SearchForm
@@ -64,31 +64,42 @@ def search(request):
     subclass = request.GET.get('subclass')
     circle_from = int(request.GET.get('circle_from'))
     circle_to = int(request.GET.get('circle_to'))
+    style = ''
+    source_class = ''
+    source_subclass = ''
 
     if dnd_class or (circle_from >=0 and circle_to >= 0):
         ### Блок обработки заклинаний
         cards = Spell.objects.filter(is_face_side=True, name__icontains=request.GET.get('name'))
-        if subclass:
-            ### Если известен сабкласс
-            cards = cards.prefetch_related(
-                Prefetch('class_race', queryset=Source.objects.filter(id__in=(dnd_class, subclass)))
-            ).filter(class_race__in=(dnd_class, subclass))
+        if dnd_class:
+            ### Если известен только класс, а сабкласс не указан
+            filters = Q(classes=dnd_class)
+            class_instance = DndClass.objects.get(id=dnd_class)
+            form.fields['subclass'].queryset = class_instance.subclasses.all()
+            source_class = class_instance.name
 
-            form.fields['subclass'].initial = subclass
-        elif dnd_class:
-            ### Если известен класс
-            cards = cards.prefetch_related(
-                Prefetch('class_race', queryset=Source.objects.filter(id=dnd_class))
-            ).filter(class_race=dnd_class)
+            if subclass:
+                ### Если известен ещё и сабкласс
+                source_subclass = SubClass.objects.get(id=subclass).name
+                filters = filters | Q(subclasses=subclass)
 
-            class_object = DndClass.objects.get(id=dnd_class)
-            form.fields['subclass'].queryset = class_object.subclasses.all()
+                form.fields['subclass'].initial = subclass
+            cards = cards.filter(filters).distinct()
+
+            style = class_instance.style
         else:
             ### Все классы
             pass
 
         if circle_from >=0 and circle_to >= 0:
             cards = cards.filter(circle__gte=circle_from, circle__lte=circle_to)
+
+        for card in cards:
+            card.source = (
+                source_subclass
+                if subclass and int(subclass) in card.subclasses.values_list('id', flat=True)
+                else source_class
+            )
 
     else:
         ### Блок обработки всего вместе
@@ -97,6 +108,7 @@ def search(request):
     context = {
         'cards': cards,
         'form': form,
+        'style': style,
     }
 
     return render(request, 'cards.html', context)
@@ -104,8 +116,11 @@ def search(request):
 
 def load_subclasses(request):
     class_id = request.GET.get('class')
-    subclasses = DndClass.objects.get(id=class_id).subclasses.all()
-    return render(request, 'tentaculus/subclasses.html', {'subclasses': subclasses})
+    if class_id:
+        dnd_subclasses = DndClass.objects.get(id=class_id).subclasses.all()
+    else:
+        dnd_subclasses = SubClass.objects.none()
+    return render(request, 'tentaculus/subclasses.html', {'subclasses': dnd_subclasses})
 
 
 def test(request):

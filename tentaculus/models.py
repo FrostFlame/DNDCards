@@ -58,7 +58,10 @@ class Spell(Card):
     components = models.TextField(choices=Component.choices)
     duration = models.ForeignKey('Duration', on_delete=models.CASCADE)
     material_component = models.CharField(max_length=100, null=True, blank=True)
-    class_race = models.ManyToManyField('Source')
+    classes = models.ManyToManyField('DndClass', null=True, blank=True)
+    subclasses = models.ManyToManyField('Subclass', null=True, blank=True)
+    race = models.ManyToManyField('Race', null=True, blank=True)
+    subrace = models.ManyToManyField('SubRace', null=True, blank=True)
     school = models.ManyToManyField('School', related_name='spells')
 
     def __str__(self):
@@ -111,14 +114,14 @@ class Source(PolymorphicModel):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ('name',)
+
 class DndClass(Source):
     style = models.CharField(max_length=20, null=True, blank=True)
 
 class SubClass(Source):
     base_class = models.ForeignKey(DndClass, related_name='subclasses', on_delete=models.CASCADE, blank=True, null=True)
-
-    def style(self):
-        return self.base_class.style
 
 class Race(Source):
     style = models.CharField(max_length=20, null=True, blank=True)
