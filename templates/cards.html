@@ -72,58 +72,27 @@
 				</div>
 			</div>
 
-
+			<div class="mediaWidth">
+				<div data-text="Школы" class="combo_box">
+					<div id="schools_label" class="combo_box_title">{{form.schools.label}}</div>
+					<div id="schools" class="combo_box_content" style="display: none">
+						{{form.schools}}
+					</div>
+					<div id="arrows" class="combo_box_arrow">
+						<span id="arr_down" class="arr_down">
+							<i class="fa fa-arrow-down"></i>
+						</span>
+						<span id="arr_up" class="arr_up" style="display: none;">
+							<i class="fa fa-arrow-up"></i>
+						</span>
+					</div>
+				</div>
+			</div>
 
 			<input class="btn" type="submit" value="Поиск" />
 		</form>
 
 
-		<div class="mediaWidth">
-			<div id="SchoolCombobox" data-text="Школы" class="combo_box">
-				<div class="combo_box_title">Школы</div>
-				<div class="combo_box_content" style="display: none;">
-					<div><input type="checkbox" id="ch_Conjuration" value="Conjuration">
-						<label data-hierarchy="root">Conjuration<br>Призыв</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_Abjuration" value="Abjuration">
-						<label data-hierarchy="root">Abjuration<br>Ограждение</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_Necromancy" value="Necromancy">
-						<label data-hierarchy="root">Necromancy<br>Некромантия</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_Evocation" value="Evocation">
-						<label data-hierarchy="root">Evocation<br>Проявление</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_Enchantment" value="Enchantment">
-						<label data-hierarchy="root">Enchantment<br>Очарование</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_Transmutation" value="Transmutation">
-						<label data-hierarchy="root">Transmutation<br>Преобразование</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_Illusion" value="Illusion">
-						<label data-hierarchy="root">Illusion<br>Иллюзия</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_Divination" value="Divination">
-						<label data-hierarchy="root">Divination<br>Прорицание</label>
-					</div>
-				</div>
-				<div class="combo_box_arrow">
-					<span class="arr_down">
-						<i class="fa fa-arrow-down"></i>
-					</span>
-					<span class="arr_up" style="display: none;">
-						<i class="fa fa-arrow-up"></i>
-					</span>
-				</div>
-			</div>
-		</div>
 		<div class="mediaWidth">
 			<div id="SourceCombobox" data-text="Источники" class="combo_box">
 				<div class="combo_box_title">Источники</div>
@@ -388,6 +357,24 @@
 				$("#id_subclass").html(data);
 			}
 		});
+
+	});
+</script>
+<script>
+	$("#schools_label, #arrows").click(function () {
+		$('#schools').toggle();
+		$('#arr_up').toggle();
+		$('#arr_down').toggle();
+
+<!--		$.ajax({-->
+<!--			url: '/ajax-subclasses',-->
+<!--			data: {-->
+<!--				'class': classId-->
+<!--			},-->
+<!--			success: function (data) {-->
+<!--				$("#id_subclass").html(data);-->
+<!--			}-->
+<!--		});-->
 
 	});
 </script>

@@ -67,8 +67,9 @@ def search(request):
     style = ''
     source_class = ''
     source_subclass = ''
+    schools = request.GET.getlist('schools')
 
-    if dnd_class or (circle_from >=0 and circle_to >= 0):
+    if dnd_class or (circle_from >=0 and circle_to >= 0) or schools:
         ### Блок обработки заклинаний
         cards = Spell.objects.filter(is_face_side=True, name__icontains=request.GET.get('name'))
         if dnd_class:
@@ -87,12 +88,12 @@ def search(request):
             cards = cards.filter(filters).distinct()
 
             style = class_instance.style
-        else:
-            ### Все классы
-            pass
 
         if circle_from >=0 and circle_to >= 0:
             cards = cards.filter(circle__gte=circle_from, circle__lte=circle_to)
+
+        if schools:
+            cards = cards.filter(school__in=schools)
 
         for card in cards:
             card.source = (

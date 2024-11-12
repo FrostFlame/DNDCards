@@ -341,8 +341,8 @@ p {
   padding: 0!important;
 }
 .combo_box input[type=checkbox] {
-  display: none;
-  position: relative;
+  /*display: none;*/
+  position: left;
   /**/
 }
 .combo_box input[type=checkbox] + label::before {
