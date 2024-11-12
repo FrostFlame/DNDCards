@@ -2,7 +2,7 @@ from audioop import reverse
 
 from django import forms
 
-from tentaculus.models import DndClass, Circle, School, Book
+from tentaculus.models import DndClass, Circle, School, Book, CastTime
 
 
 class SearchForm(forms.Form):
@@ -41,4 +41,10 @@ class SearchForm(forms.Form):
         required=False,
         widget=forms.CheckboxSelectMultiple,
         queryset=Book.objects.order_by('title'),
+    )
+    cast_times = forms.ModelMultipleChoiceField(
+        label='Время накладывания',
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        queryset=CastTime.objects.order_by('name'),
     )

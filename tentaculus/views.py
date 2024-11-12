@@ -69,8 +69,9 @@ def search(request):
     source_subclass = ''
     schools = request.GET.getlist('schools')
     books = request.GET.getlist('books')
+    cast_times = request.GET.getlist('cast_times')
 
-    if dnd_class or (circle_from >=0 and circle_to >= 0) or schools:
+    if dnd_class or (circle_from >=0 and circle_to >= 0) or schools or cast_times:
         ### Блок обработки заклинаний
         cards = Spell.objects.filter(is_face_side=True, name__icontains=request.GET.get('name'))
         if dnd_class:
@@ -95,6 +96,9 @@ def search(request):
 
         if schools:
             cards = cards.filter(school__in=schools)
+
+        if cast_times:
+            cards = cards.filter(cast_time__in=cast_times)
 
         for card in cards:
             card.source = (

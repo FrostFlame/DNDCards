@@ -106,16 +106,27 @@
 				</div>
 			</div>
 
+			<div class="mediaWidth">
+				<div data-text="Время накладывания" class="combo_box">
+					<div id="cast_times_label" class="combo_box_title">{{form.cast_times.label}}</div>
+					<div id="cast_times" class="combo_box_content" style="display: none">
+						{{form.cast_times}}
+					</div>
+					<div id="cast_times_arrows" class="combo_box_arrow">
+						<span id="cast_times_arr_down" class="arr_down">
+							<i class="fa fa-arrow-down"></i>
+						</span>
+						<span id="cast_times_arr_up" class="arr_up" style="display: none;">
+							<i class="fa fa-arrow-up"></i>
+						</span>
+					</div>
+				</div>
+			</div>
+
 			<input class="btn" type="submit" value="Поиск" />
 		</form>
 
 
-		<div class="mediaWidth">
-			<div id="TashaOptionalCheckbox" title="Показывать в  том числе те заклинания, которые добавлены классу в качестве опциональных в Котле Таши" class="customCheckbox">
-				<input type="checkbox" id="chb_TashaOptionalCheckbox">
-				<span class="label">Опциональные из Таши</span>
-			</div>
-		</div>
 		<div class="mediaWidth">
 			<div id="CastingTimeCombobox" data-text="Время накладывания" class="combo_box">
 				<div class="combo_box_title">Время накладывания</div>
@@ -330,6 +341,13 @@
 		$('#books').toggle();
 		$('#books_arr_up').toggle();
 		$('#books_arr_down').toggle();
+	});
+</script>
+<script>
+	$("#cast_times_label, #cast_times_arrows").click(function () {
+		$('#cast_times').toggle();
+		$('#cast_times_arr_up').toggle();
+		$('#cast_times_arr_down').toggle();
 	});
 </script>
 {% endblock %}
