@@ -2,7 +2,7 @@ from audioop import reverse
 
 from django import forms
 
-from tentaculus.models import DndClass, Circle, School
+from tentaculus.models import DndClass, Circle, School, Book
 
 
 class SearchForm(forms.Form):
@@ -35,4 +35,10 @@ class SearchForm(forms.Form):
         required=False,
         widget=forms.CheckboxSelectMultiple,
         queryset=School.objects.order_by('name'),
+    )
+    books = forms.ModelMultipleChoiceField(
+        label='Книги',
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        queryset=Book.objects.order_by('title'),
     )

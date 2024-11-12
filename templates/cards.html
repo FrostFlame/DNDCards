@@ -78,11 +78,28 @@
 					<div id="schools" class="combo_box_content" style="display: none">
 						{{form.schools}}
 					</div>
-					<div id="arrows" class="combo_box_arrow">
-						<span id="arr_down" class="arr_down">
+					<div id="schools_arrows" class="combo_box_arrow">
+						<span id="schools_arr_down" class="arr_down">
 							<i class="fa fa-arrow-down"></i>
 						</span>
-						<span id="arr_up" class="arr_up" style="display: none;">
+						<span id="schools_arr_up" class="arr_up" style="display: none;">
+							<i class="fa fa-arrow-up"></i>
+						</span>
+					</div>
+				</div>
+			</div>
+
+			<div class="mediaWidth">
+				<div data-text="Книги" class="combo_box">
+					<div id="books_label" class="combo_box_title">{{form.books.label}}</div>
+					<div id="books" class="combo_box_content" style="display: none">
+						{{form.books}}
+					</div>
+					<div id="books_arrows" class="combo_box_arrow">
+						<span id="books_arr_down" class="arr_down">
+							<i class="fa fa-arrow-down"></i>
+						</span>
+						<span id="books_arr_up" class="arr_up" style="display: none;">
 							<i class="fa fa-arrow-up"></i>
 						</span>
 					</div>
@@ -93,65 +110,6 @@
 		</form>
 
 
-		<div class="mediaWidth">
-			<div id="SourceCombobox" data-text="Источники" class="combo_box">
-				<div class="combo_box_title">Источники</div>
-				<div class="combo_box_content" style="display: none;">
-					<div>
-						<input type="checkbox" id="ch_PHB" value="PHB">
-						<label data-hierarchy="root">Players Handbook<br>Книга игрока</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_TOEE" value="TOEE">
-						<label data-hierarchy="root">Temple of Elemental Evil<br>Храм стихийного зла</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_SCAG" value="SCAG">
-						<label data-hierarchy="root">Sword Coast Adventurers Guide<br>Путеводитель Приключенца по Побережью Мечей</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_SCPC" value="SCPC">
-						<label data-hierarchy="root">Sprouting Chaos<br>Прорастающий Хаос
-							<span class="subtitle">Homebrew /Самопал</span>
-						</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_XGTE" value="XGTE">
-						<label data-hierarchy="root">Xanathar's Guide to Everything<br>Руководство Занатара обо всем</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_TCoE" value="TCoE">
-						<label data-hierarchy="root">Tasha’s Cauldron of Everything<br>Котёл Таши со всякой всячиной</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_SCC" value="SCC">
-						<label data-hierarchy="root">Strixhaven: Curriculum of Chaos<br>Стриксхейвен</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_AI" value="AI">
-						<label data-hierarchy="root">Acquisitions Incorporated<br>Acquisitions Incorporated</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_FTD" value="FTD">
-						<label data-hierarchy="root">Fizban's Treasury of Dragons<br>Сокровищница драконов Физбана</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_HB" value="HB">
-						<label data-hierarchy="root">Самопал<br>Homebrew
-							<span class="subtitle">Homebrew /Самопал</span>
-						</label>
-					</div>
-				</div>
-				<div class="combo_box_arrow">
-					<span class="arr_down">
-						<i class="fa fa-arrow-down"></i>
-					</span>
-					<span class="arr_up" style="display: none;">
-						<i class="fa fa-arrow-up"></i>
-					</span>
-				</div>
-			</div>
-		</div>
 		<div class="mediaWidth">
 			<div id="TashaOptionalCheckbox" title="Показывать в  том числе те заклинания, которые добавлены классу в качестве опциональных в Котле Таши" class="customCheckbox">
 				<input type="checkbox" id="chb_TashaOptionalCheckbox">
@@ -361,21 +319,17 @@
 	});
 </script>
 <script>
-	$("#schools_label, #arrows").click(function () {
+	$("#schools_label, #schools_arrows").click(function () {
 		$('#schools').toggle();
-		$('#arr_up').toggle();
-		$('#arr_down').toggle();
-
-<!--		$.ajax({-->
-<!--			url: '/ajax-subclasses',-->
-<!--			data: {-->
-<!--				'class': classId-->
-<!--			},-->
-<!--			success: function (data) {-->
-<!--				$("#id_subclass").html(data);-->
-<!--			}-->
-<!--		});-->
-
+		$('#schools_arr_up').toggle();
+		$('#schools_arr_down').toggle();
+	});
+</script>
+<script>
+	$("#books_label, #books_arrows").click(function () {
+		$('#books').toggle();
+		$('#books_arr_up').toggle();
+		$('#books_arr_down').toggle();
 	});
 </script>
 {% endblock %}

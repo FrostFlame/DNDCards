@@ -68,6 +68,7 @@ def search(request):
     source_class = ''
     source_subclass = ''
     schools = request.GET.getlist('schools')
+    books = request.GET.getlist('books')
 
     if dnd_class or (circle_from >=0 and circle_to >= 0) or schools:
         ### Блок обработки заклинаний
@@ -105,6 +106,9 @@ def search(request):
     else:
         ### Блок обработки всего вместе
         cards = Card.objects.filter(is_face_side=True, name__icontains=request.GET.get('name'))
+
+    if books:
+        cards = cards.filter(book__in=books)
 
     context = {
         'cards': cards,
