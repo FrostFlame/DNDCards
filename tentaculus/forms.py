@@ -48,3 +48,7 @@ class SearchForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
         queryset=CastTime.objects.order_by('name'),
     )
+    is_ritual = forms.BooleanField(
+        label='Ритуальные заклинания',
+        required=False
+    )

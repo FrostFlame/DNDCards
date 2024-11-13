@@ -123,81 +123,17 @@
 				</div>
 			</div>
 
+			<div class="mediaWidth">
+				<div id="RitualCheckbox" title="" class="customCheckbox">
+					{{form.is_ritual}}
+					<span class="label">{{form.is_ritual.label}}</span>
+				</div>
+			</div>
+
 			<input class="btn" type="submit" value="Поиск" />
 		</form>
 
 
-		<div class="mediaWidth">
-			<div id="CastingTimeCombobox" data-text="Время накладывания" class="combo_box">
-				<div class="combo_box_title">Время накладывания</div>
-				<div class="combo_box_content" style="display: none;">
-					<div><input type="checkbox" id="ch_1 action" value="1 action">
-						<label data-hierarchy="root">1 action<br>1 действие</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_1 minute" value="1 minute">
-						<label data-hierarchy="root">1 minute<br>1 минута</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_1 bonus action" value="1 bonus action">
-						<label data-hierarchy="root">1 bonus action<br>1 бонусное действие</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_1 reaction" value="1 reaction">
-						<label data-hierarchy="root">1 reaction<br>1 реакция</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_1 hour" value="1 hour">
-						<label data-hierarchy="root">1 hour<br>1 час</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_10 minutes" value="10 minutes">
-						<label data-hierarchy="root">10 minutes<br>10 минут</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_12 hours" value="12 hours">
-						<label data-hierarchy="root">12 hours<br>12 hours</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_1 action or 8 hours" value="1 action or 8 hours">
-						<label data-hierarchy="root">1 action or 8 hours<br>1 действие или 8 часов</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_8 hours" value="8 hours">
-						<label data-hierarchy="root">8 hours<br>8 часов</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_24 hours" value="24 hours">
-						<label data-hierarchy="root">24 hours<br>24 часа</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_1 reaction, which you take when a humanoid you can see within 60 feet of you dies" value="1 reaction, which you take when a humanoid you can see within 60 feet of you dies">
-						<label data-hierarchy="root">1 reaction, which you take when a humanoid you can see within 60 feet of you dies<br>1 реакция, когда гуманоди в пределах 60 футов от вас, которого вы можете видеть, умираент</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_1 reaction, which you take when a creature you can see within 60 feet of yourself succeeds on an attack roll, an ability check, or a saving throw" value="1 reaction, which you take when a creature you can see within 60 feet of yourself succeeds on an attack roll, an ability check, or a saving throw">
-						<label data-hierarchy="root">1 reaction, which you take when a creature you can see within 60 feet of yourself succeeds on an attack roll, an ability check, or a saving throw<br>1 реакция, совершаемая вами, когда видимое вами существо в пределах 60 футов от вас преуспевает в броске атаке, проверке характеристики или спасброске</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_ 1 minute" value=" 1 minute">
-						<label data-hierarchy="root"> 1 minute<br>1 минута</label>
-					</div>
-					<div>
-						<input type="checkbox" id="ch_1 reaction, which you take when you speak to another creature" value="1 reaction, which you take when you speak to another creature">
-
-						<label data-hierarchy="root">1 reaction, which you take when you speak to another creature<br>1 реакция, совершаемая вами, когда вы говорите с другим существом</label>
-					</div>
-				</div>
-				<div class="combo_box_arrow">
-					<span class="arr_down">
-						<i class="fa fa-arrow-down"></i>
-					</span>
-					<span class="arr_up" style="display: none;">
-						<i class="fa fa-arrow-up"></i>
-					</span>
-				</div>
-			</div>
-		</div>
 		<div class="mediaWidth">
 			<div id="RitualCheckbox" title="" class="customCheckbox">
 				<input type="checkbox" id="chb_RitualCheckbox">
@@ -328,26 +264,27 @@
 		});
 
 	});
-</script>
-<script>
+
 	$("#schools_label, #schools_arrows").click(function () {
 		$('#schools').toggle();
 		$('#schools_arr_up').toggle();
 		$('#schools_arr_down').toggle();
 	});
-</script>
-<script>
+
 	$("#books_label, #books_arrows").click(function () {
 		$('#books').toggle();
 		$('#books_arr_up').toggle();
 		$('#books_arr_down').toggle();
 	});
-</script>
-<script>
+
 	$("#cast_times_label, #cast_times_arrows").click(function () {
 		$('#cast_times').toggle();
 		$('#cast_times_arr_up').toggle();
 		$('#cast_times_arr_down').toggle();
+	});
+
+	$("#RitualCheckbox").click(function () {
+		$("#id_is_ritual").prop("checked", !$("#id_is_ritual").prop("checked"));
 	});
 </script>
 {% endblock %}

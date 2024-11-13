@@ -70,8 +70,10 @@ def search(request):
     schools = request.GET.getlist('schools')
     books = request.GET.getlist('books')
     cast_times = request.GET.getlist('cast_times')
+    is_ritual = request.GET.get('is_ritual')
 
-    if dnd_class or (circle_from >=0 and circle_to >= 0) or schools or cast_times:
+
+    if dnd_class or (circle_from >=0 and circle_to >= 0) or schools or cast_times or is_ritual:
         ### Блок обработки заклинаний
         cards = Spell.objects.filter(is_face_side=True, name__icontains=request.GET.get('name'))
         if dnd_class:
@@ -99,6 +101,9 @@ def search(request):
 
         if cast_times:
             cards = cards.filter(cast_time__in=cast_times)
+
+        if is_ritual:
+            cards = cards.filter(is_ritual=True)
 
         for card in cards:
             card.source = (
