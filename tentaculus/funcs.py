@@ -5,6 +5,9 @@ from tentaculus.models import Card, SubClass, DndClass, Spell
 
 
 def get_cards_info(request):
+    """
+    Получение контекста по данным из реквеста
+    """
     if request.method == 'GET':
         data = request.GET
     else:

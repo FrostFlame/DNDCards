@@ -81,6 +81,9 @@ def search(request):
 
 
 def load_subclasses(request):
+    """
+    AJAX подгрузка карт по фильтру подкласса
+    """
     class_id = request.GET.get('class')
     if class_id:
         dnd_subclasses = DndClass.objects.get(id=class_id).subclasses.all()
@@ -90,6 +93,9 @@ def load_subclasses(request):
 
 
 async def get_pdf(request):
+    """
+    Генерация pdf
+    """
     url = (
         f'http://127.0.0.1:8000/cards_block?'
         f'name={request.POST.get("name")}'
