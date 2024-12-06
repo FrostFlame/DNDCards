@@ -145,7 +145,8 @@ body {
   min-height: 100%;
   height: auto;
   font-size: 12px;
-  background-color: #fff;
+  background-color: #222;
+  background: linear-gradient(45deg, #EECFBA, #C5DDE8);
   background-attachment: fixed;
   background-size: cover;
   font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -1393,7 +1394,7 @@ p {
 .spellCard.selected:hover {
   outline-color: #487EC5;
 }
-.spellCard-content {
+.spellCard .content {
   border-radius: 5px;
   background: #fff;
   position: absolute;

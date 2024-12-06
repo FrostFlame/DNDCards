@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+{% block content %}
+<body style="background: linear-gradient(45deg, #EECFBA, #C5DDE8);">
+	<div id="app" class="wrap">
+		<div class="p_side">
+			<form id='search-form' action="/search/" method="post">
+				{% csrf_token %}
+
+				<div class="mediaWidth flexParent">
+					<a href="/" title="На главную страницу" class="bt flexChild">
+						<i class="fa fa-home"></i>
+					</a>
+					<button type="submit" name="print" class="btn-link bt flexChild"><i aria-hidden="true" class="fa fa-print"></i></button>
+				</div>
+
+				<div class="mediaWidth flexParent">
+					<a href="/spells" title="Spells" class="bt flexChild">
+						<i>Заклинания</i>
+					</a>
+					<a href="/items" title="Items" class="bt flexChild">
+						<i>Предметы</i>
+					</a>
+				</div>
+
+				<div class="mediaWidth">
+					<div id="NameInput">
+						<label class="filterLabel">{{ form.name.label }}</label>
+						<div style="display: flex;">
+							<div class="customInput">
+								{{ form.name }}
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="mediaWidth">
+					<div id="ClassSelect">
+						<label class="filterLabel">{{ form.dnd_class.label }}</label>
+						<div>
+							{{ form.dnd_class }}
+						</div>
+					</div>
+				</div>
+
+				<div class="mediaWidth">
+					<div id="SubClassSelect">
+						<label class="filterLabel">{{ form.subclass.label }}</label>
+						<div class="customSelect">
+							{{ form.subclass }}
+						</div>
+					</div>
+				</div>
+
+				<div class="mediaWidth">
+					<label class="filterLabel">Уровень с/по</label>
+					<div class="row">
+						<div class="cell">
+							<div id="LevelSelectStart">
+								<div class="customSelect">
+									{{ form.circle_from }}
+								</div>
+							</div>
+						</div>
+						<div class="cell">
+							<div id="LevelSelectEnd">
+								<div class="customSelect">
+									{{ form.circle_to }}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="mediaWidth">
+					<div data-text="Школы" class="combo_box">
+						<div id="schools_label" class="combo_box_title">{{form.schools.label}}</div>
+						<div id="schools" class="combo_box_content" style="display: none">
+							{{form.schools}}
+						</div>
+						<div id="schools_arrows" class="combo_box_arrow">
+							<span id="schools_arr_down" class="arr_down">
+								<i class="fa fa-arrow-down"></i>
+							</span>
+							<span id="schools_arr_up" class="arr_up" style="display: none;">
+								<i class="fa fa-arrow-up"></i>
+							</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="mediaWidth">
+					<div data-text="Книги" class="combo_box">
+						<div id="books_label" class="combo_box_title">{{form.books.label}}</div>
+						<div id="books" class="combo_box_content" style="display: none">
+							{{form.books}}
+						</div>
+						<div id="books_arrows" class="combo_box_arrow">
+							<span id="books_arr_down" class="arr_down">
+								<i class="fa fa-arrow-down"></i>
+							</span>
+							<span id="books_arr_up" class="arr_up" style="display: none;">
+								<i class="fa fa-arrow-up"></i>
+							</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="mediaWidth">
+					<div data-text="Время накладывания" class="combo_box">
+						<div id="cast_times_label" class="combo_box_title">{{form.cast_times.label}}</div>
+						<div id="cast_times" class="combo_box_content" style="display: none">
+							{{form.cast_times}}
+						</div>
+						<div id="cast_times_arrows" class="combo_box_arrow">
+							<span id="cast_times_arr_down" class="arr_down">
+								<i class="fa fa-arrow-down"></i>
+							</span>
+							<span id="cast_times_arr_up" class="arr_up" style="display: none;">
+								<i class="fa fa-arrow-up"></i>
+							</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="mediaWidth">
+					<div id="RitualCheckbox" title="" class="customCheckbox">
+						{{form.is_ritual}}
+						<span class="label">{{form.is_ritual.label}}</span>
+					</div>
+				</div>
+
+				<input class="btn" name="search" type="submit" value="Поиск" />
+			</form>
+
+			<div class="mediaWidth" style="display: none;">
+				<label class="filterLabel">Скрытые заклинания (0)</label>
+				<div id="HiddenItems">
+					<a href="https://tentaculus.ru/spells/index.html#" class="bReturnUnvisible">Вернуть все обратно</a>
+				</div>
+			</div>
+		</div>
+
+		{% include "cards.html" %}
+	</div>
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script>
+		$("#id_dnd_class").change(function () {
+			var classId = $(this).val();
+
+			$.ajax({
+				url: '/ajax-subclasses',
+				data: {
+					'class': classId
+				},
+				success: function (data) {
+					$("#id_subclass").html(data);
+				}
+			});
+
+		});
+
+		$("#schools_label, #schools_arrows").click(function () {
+			$('#schools').toggle();
+			$('#schools_arr_up').toggle();
+			$('#schools_arr_down').toggle();
+		});
+
+		$("#books_label, #books_arrows").click(function () {
+			$('#books').toggle();
+			$('#books_arr_up').toggle();
+			$('#books_arr_down').toggle();
+		});
+
+		$("#cast_times_label, #cast_times_arrows").click(function () {
+			$('#cast_times').toggle();
+			$('#cast_times_arr_up').toggle();
+			$('#cast_times_arr_down').toggle();
+		});
+
+		$("#RitualCheckbox").click(function () {
+			$("#id_is_ritual").prop("checked", !$("#id_is_ritual").prop("checked"));
+		});
+	</script>
+</body>
+{% endblock %}
