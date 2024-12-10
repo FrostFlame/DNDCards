@@ -49,6 +49,9 @@ class Card(PolymorphicModel):
     def __str__(self):
         return self.name
 
+    def __len__(self):
+        return 1 if self.is_face_side and not self.second_side else 2
+
 
 class Spell(Card):
     circle = models.IntegerField(choices=Circle.choices)

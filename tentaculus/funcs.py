@@ -72,10 +72,39 @@ def get_cards_info(request):
     if books:
         cards = cards.filter(book__in=books)
 
+    cards, pdf_orientation = sort_cards(cards)
+
     context = {
         'cards': cards,
         'form': form,
         'style': style,
+        'pdf_orientation': pdf_orientation,
     }
 
     return context
+
+
+def sort_cards(cards):
+    """
+    Сортировка карт для pdf.
+    Если двойных карт больше, чем одинарных - альбомная сортировка, иначе - портретная
+    :param cards: Query карт для сортировки
+    """
+    ones = [card for card in cards if len(card) == 1]
+    twos = [card for card in cards if len(card) == 2]
+
+    if len(twos) > len(ones):
+        # Горизонтальная ориентация
+        landscape_orientation = True
+        cards = twos + ones
+    else:
+        # Вертикальная ориентация
+
+        landscape_orientation = False
+
+        result_cards = []
+        for row in zip(ones, twos):
+            result_cards.extend(row)
+        result_cards.extend(ones[len(twos):])
+
+    return cards, landscape_orientation

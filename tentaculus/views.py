@@ -75,7 +75,7 @@ def search(request):
     context = get_cards_info(request)
 
     if 'print' in request.POST:
-        return async_to_sync(get_pdf)(request)
+        return async_to_sync(get_pdf)(request, context.get('pdf_orientation'))
     else:
         return render(request, 'main.html', context)
 
@@ -92,7 +92,7 @@ def load_subclasses(request):
     return render(request, 'tentaculus/subclasses.html', {'subclasses': dnd_subclasses})
 
 
-async def get_pdf(request):
+async def get_pdf(request, pdf_orientation):
     """
     Генерация pdf
     """
@@ -110,7 +110,8 @@ async def get_pdf(request):
     page = await browser.newPage()
     await page.goto(url)
     await page.emulateMedia('screen')
-    await page.pdf({'path': pdf_path, 'format': 'A4', 'printBackground': True})
+    await page.pdf({'path': pdf_path, 'format': 'Letter' if pdf_orientation else 'A4', 'printBackground': True,
+                    'landscape': pdf_orientation})
 
     try:
         with open(pdf_path, 'rb') as content:
