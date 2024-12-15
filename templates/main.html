@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load custom_filters %}
 {% block content %}
 <body style="background: linear-gradient(45deg, #EECFBA, #C5DDE8);">
 	<div id="app" class="wrap">
@@ -75,14 +74,16 @@
 				<div class="mediaWidth">
 					<div data-text="Школы" class="combo_box">
 						<div id="schools_label" class="combo_box_title">{{form.schools.label}}</div>
-						<div id="schools" class="combo_box_content" style="display: none">
-							{{form.schools}}
+						<div id="schools" class="combo_box_content">
+							{% for school in form.schools %}
+								{{ school }}
+							{% endfor %}
 						</div>
 						<div id="schools_arrows" class="combo_box_arrow">
-							<span id="schools_arr_down" class="arr_down">
+							<span id="schools_arr_down" class="arr_down" style="display: none;">
 								<i class="fa fa-arrow-down"></i>
 							</span>
-							<span id="schools_arr_up" class="arr_up" style="display: none;">
+							<span id="schools_arr_up" class="arr_up">
 								<i class="fa fa-arrow-up"></i>
 							</span>
 						</div>
@@ -92,14 +93,16 @@
 				<div class="mediaWidth">
 					<div data-text="Книги" class="combo_box">
 						<div id="books_label" class="combo_box_title">{{form.books.label}}</div>
-						<div id="books" class="combo_box_content" style="display: none">
-							{{form.books}}
+						<div id="books" class="combo_box_content">
+							{% for book in form.books %}
+								{{ book }}
+							{% endfor %}
 						</div>
 						<div id="books_arrows" class="combo_box_arrow">
-							<span id="books_arr_down" class="arr_down">
+							<span id="books_arr_down" class="arr_down" style="display: none;">
 								<i class="fa fa-arrow-down"></i>
 							</span>
-							<span id="books_arr_up" class="arr_up" style="display: none;">
+							<span id="books_arr_up" class="arr_up">
 								<i class="fa fa-arrow-up"></i>
 							</span>
 						</div>
@@ -109,14 +112,16 @@
 				<div class="mediaWidth">
 					<div data-text="Время накладывания" class="combo_box">
 						<div id="cast_times_label" class="combo_box_title">{{form.cast_times.label}}</div>
-						<div id="cast_times" class="combo_box_content" style="display: none">
-							{{form.cast_times}}
+						<div id="cast_times" class="combo_box_content">
+							{% for cast_time in form.cast_times %}
+								{{ cast_time }}
+							{% endfor %}
 						</div>
 						<div id="cast_times_arrows" class="combo_box_arrow">
-							<span id="cast_times_arr_down" class="arr_down">
+							<span id="cast_times_arr_down" class="arr_down" style="display: none;">
 								<i class="fa fa-arrow-down"></i>
 							</span>
-							<span id="cast_times_arr_up" class="arr_up" style="display: none;">
+							<span id="cast_times_arr_up" class="arr_up">
 								<i class="fa fa-arrow-up"></i>
 							</span>
 						</div>
@@ -181,6 +186,8 @@
 		$("#RitualCheckbox").click(function () {
 			$("#id_is_ritual").prop("checked", !$("#id_is_ritual").prop("checked"));
 		});
+
+
 	</script>
 </body>
 {% endblock %}
