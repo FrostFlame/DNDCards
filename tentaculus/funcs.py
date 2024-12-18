@@ -24,9 +24,9 @@ def get_cards_info(request):
     schools = data.getlist('schools')
     books = data.getlist('books')
     cast_times = data.getlist('cast_times')
-    is_ritual = data.get('is_ritual')
+    is_ritual = data.get('is_ritual') == 'true'
 
-    if dnd_class or (circle_from >= 0 and circle_to >= 0) or schools or cast_times or is_ritual:
+    if dnd_class or circle_from >= 0 or circle_to >= 0 or schools or cast_times or is_ritual:
         ### Блок обработки заклинаний
         cards = Spell.objects.filter(is_face_side=True, name__icontains=data.get('name'))
         if dnd_class:
@@ -46,8 +46,11 @@ def get_cards_info(request):
 
             style = class_instance.style
 
-        if circle_from >= 0 and circle_to >= 0:
-            cards = cards.filter(circle__gte=circle_from, circle__lte=circle_to)
+        if circle_from >= 0:
+            cards = cards.filter(circle__gte=circle_from)
+
+        if circle_to >= 0:
+            cards = cards.filter(circle__lte=circle_to)
 
         if schools:
             cards = cards.filter(school__in=schools)

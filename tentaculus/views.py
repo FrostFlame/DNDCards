@@ -69,15 +69,16 @@ def search(request):
     """
     Поиск
     """
-    if not all((request.POST.get('circle_from'), request.POST.get('circle_to'))):
-        return all_cards(request)
-
     context = get_cards_info(request)
+    return render(request, 'cards.html', context)
 
-    if 'print' in request.POST:
-        return async_to_sync(get_pdf)(request, context.get('pdf_orientation'))
-    else:
-        return render(request, 'main.html', context)
+
+def print_pdf(request):
+    """
+    Печать pdf по кнопке
+    """
+    context = get_cards_info(request)
+    return async_to_sync(get_pdf)(request, context.get('pdf_orientation'))
 
 
 def load_subclasses(request):
@@ -98,11 +99,11 @@ async def get_pdf(request, pdf_orientation):
     """
     url = (
         f'http://127.0.0.1:8000/cards_block?'
-        f'name={request.POST.get("name")}'
-        f'&dnd_class={request.POST.get("dnd_class")}'
-        f'&subclass={request.POST.get("subclass")}'
-        f'&circle_from={request.POST.get("circle_from")}'
-        f'&circle_to={request.POST.get("circle_to")}'
+        f'name={request.GET.get("name")}'
+        f'&dnd_class={request.GET.get("dnd_class")}'
+        f'&subclass={request.GET.get("subclass")}'
+        f'&circle_from={request.GET.get("circle_from")}'
+        f'&circle_to={request.GET.get("circle_to")}'
     )
     pdf_path = 'example.pdf'
 
