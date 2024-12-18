@@ -14,6 +14,7 @@ def get_cards_info(request):
         data = request.POST
 
     form = SearchForm(data)
+    name = data.get('name')
     dnd_class = data.get('dnd_class')
     subclass = data.get('subclass')
     circle_from = int(data.get('circle_from'))
@@ -28,7 +29,7 @@ def get_cards_info(request):
 
     if dnd_class or circle_from >= 0 or circle_to >= 0 or schools or cast_times or is_ritual:
         ### Блок обработки заклинаний
-        cards = Spell.objects.filter(is_face_side=True, name__icontains=data.get('name'))
+        cards = Spell.objects.all()
         if dnd_class:
             ### Если известен только класс, а сабкласс не указан
             filters = Q(classes=dnd_class)
@@ -70,7 +71,15 @@ def get_cards_info(request):
 
     else:
         ### Блок обработки всего вместе
-        cards = Card.objects.filter(is_face_side=True, name__icontains=data.get('name'))
+        cards = Card.objects.all()
+
+    if name:
+        name = name.strip().split(',')
+        filters = Q()
+        for separate_name in name:
+            if separate_name:
+                filters = filters | Q(name__icontains=separate_name.strip())
+        cards = cards.filter(filters)
 
     if books:
         cards = cards.filter(book__in=books)
