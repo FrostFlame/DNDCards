@@ -13,6 +13,11 @@ def get_cards_info(request):
     else:
         data = request.POST
 
+    locked_to_print = request.GET.get('locked_to_print')
+
+    if locked_to_print:
+        return get_locked_cards_info(locked_to_print)
+
     form = SearchForm(data)
     name = data.get('name')
     dnd_class = data.get('dnd_class')
@@ -86,19 +91,49 @@ def get_cards_info(request):
 
     cards, pdf_orientation = sort_cards(cards)
 
+    for card in cards:
+        if card.style == 'Default':
+            card.style = style
+
     context = {
         'cards': cards,
         'form': form,
-        'style': style,
         'pdf_orientation': pdf_orientation,
     }
 
     return context
 
 
+def get_locked_cards_info(cards_names):
+    """
+    Получение контекста блока залоченных карт
+
+    :param cards_names: Строка, объединённых через запятую имён залоченных карт
+    """
+    cards = []
+    cards_names = (card_name.strip() for card_name in cards_names.split(', ') if card_name)
+    for card_name in cards_names:
+        card_name, style = card_name.split('|')
+        if card_name[0].isdigit():
+            card_name = ''.join(card_name.split('. ')[1:])
+        card = Card.objects.get(name__iexact=card_name)
+
+        if card.style == 'Default':
+            card.style = style
+        cards.append(card)
+
+    cards, pdf_orientation = sort_cards(cards)
+
+    context = {
+        'locked_cards': cards,
+        'pdf_orientation': pdf_orientation,
+    }
+    return context
+
+
 def sort_cards(cards):
     """
-    Сортировка карт для pdf.
+    Сортировка карт для pdf
     Если двойных карт больше, чем одинарных - альбомная сортировка, иначе - портретная
     :param cards: Query карт для сортировки
     """
@@ -108,7 +143,7 @@ def sort_cards(cards):
     if len(twos) > len(ones):
         # Горизонтальная ориентация
         landscape_orientation = True
-        cards = twos + ones
+        result_cards = twos + ones
     else:
         # Вертикальная ориентация
 
@@ -119,4 +154,4 @@ def sort_cards(cards):
             result_cards.extend(row)
         result_cards.extend(ones[len(twos):])
 
-    return cards, landscape_orientation
+    return result_cards, landscape_orientation

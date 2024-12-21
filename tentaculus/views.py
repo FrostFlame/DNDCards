@@ -1,4 +1,5 @@
 import os
+from tempfile import template
 
 from asgiref.sync import async_to_sync
 from django.http import HttpResponse
@@ -21,7 +22,8 @@ def all_cards(request):
 
     form = SearchForm(request.GET)
 
-    cards = Card.objects.filter(is_face_side=True)
+    cards = list(Card.objects.filter(is_face_side=True))
+
     context = {
         'cards': cards,
         'form': form,
@@ -31,8 +33,12 @@ def all_cards(request):
 
 def cards_block(request):
     context = get_cards_info(request)
+    if request.GET.get('locked_to_print'):
+        template_name = 'locked_cards.html'
+    else:
+        template_name = 'cards.html'
 
-    return render(request, 'cards.html', context)
+    return render(request, template_name, context)
 
 
 def all_spells(request):
@@ -73,6 +79,14 @@ def search(request):
     return render(request, 'cards.html', context)
 
 
+def update_locked_block(request):
+    """
+    Апдейт залоченных карт
+    """
+    context = get_cards_info(request)
+    return render(request, 'locked_cards.html', context)
+
+
 def print_pdf(request):
     """
     Печать pdf по кнопке
@@ -104,6 +118,11 @@ async def get_pdf(request, pdf_orientation):
         f'&subclass={request.GET.get("subclass")}'
         f'&circle_from={request.GET.get("circle_from")}'
         f'&circle_to={request.GET.get("circle_to")}'
+        f'{("&schools=" + request.GET.getlist("schools")) if request.GET.getlist("schools") else ""}'
+        f'{"&books=" + request.GET.getlist("books") if request.GET.getlist("books") else ""}'
+        f'{"&cast_times=" + request.GET.getlist("cast_times") if request.GET.getlist("cast_times") else ""}'
+        f'&is_ritual={request.GET.get("is_ritual")}'
+        f'&locked_to_print={request.GET.get("locked_to_print")}'
     )
     pdf_path = 'example.pdf'
 
@@ -123,15 +142,3 @@ async def get_pdf(request, pdf_orientation):
             return response
     except:
         return all_cards(request())
-
-
-def test(request):
-    form = SearchForm(request.GET)
-
-    cards = Card.objects.filter(is_face_side=True)
-    context = {
-        'cards': [card for card in cards],
-        'form': form,
-    }
-
-    return render(request, 'main.html', context)

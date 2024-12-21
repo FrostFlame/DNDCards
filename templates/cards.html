@@ -4,7 +4,7 @@
 	<div class='p_cont' ref="cardContainer">
 		<div class="row spellContainer">
 			{% for card in cards %}
-				{% if card.style %}
+				{% if card.style == "Item" %}
 					{% include "tentaculus/item_card.html" %}
 				{% else %}
 					{% include "tentaculus/spell_card.html" %}
@@ -17,5 +17,23 @@
 			{% endfor %}
 		</div>
 	</div>
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script>
+		$(".bLockItem").click(function () {
+			console.log('Здесь');
+			console.log($(this).parent().parent().parent());
+			console.log($(this).parent().parent().parent().prop("class"));
+			var card_name = $(this).siblings("h1")[0].innerText;
+			var hidden_field_value = $("#locked_to_print").prop("value") + ", " + card_name + "|" + $(this).parent().parent().parent().prop("class").split(" ")[2];
+			$("#locked_to_print").prop("value", hidden_field_value);
+
+			$.ajax({
+				url: `/ajax-locked-block?locked_to_print=${hidden_field_value}`,
+				success: function (data) {
+					$("#locked_container").html(data);
+				}
+			});
+		});
+	</script>
 </body>
 {% endblock %}

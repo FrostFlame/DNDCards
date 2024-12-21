@@ -1195,6 +1195,7 @@ p {
 .bLockItem,
 .bUnlockItem {
   left: .1em;
+  top: .1em;
 }
 .spellContainer {
   position: relative;
@@ -1380,7 +1381,7 @@ p {
 .spellCard {
   height: 3.5in;
   background: #e01a10;
-  border: 2px solid #e01a10;
+  border: 3px solid #e01a10;
   border-bottom-width: 25px;
   position: relative;
   color: #000;

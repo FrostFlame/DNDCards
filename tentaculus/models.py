@@ -54,6 +54,7 @@ class Card(PolymorphicModel):
 
 
 class Spell(Card):
+    style = 'Default'
     circle = models.IntegerField(choices=Circle.choices)
     is_ritual = models.BooleanField(default=False)
     cast_time = models.ForeignKey('CastTime', on_delete=models.CASCADE)

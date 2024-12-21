@@ -4,13 +4,12 @@
 	<div id="app" class="wrap">
 		<div class="p_side">
 			<form id='search-form' action="/print_pdf/" method="get">
-<!--				{% csrf_token %}-->
-
+				<input type="hidden" id="locked_to_print" name="locked_to_print" value="">
 				<div class="mediaWidth flexParent">
 					<a href="/" title="На главную страницу" class="bt flexChild">
 						<i class="fa fa-home"></i>
 					</a>
-					<button type="submit" name="print" class="btn-link bt flexChild"><i aria-hidden="true" class="fa fa-print"></i></button>
+					<button type="submit" class="btn-link bt flexChild"><i aria-hidden="true" class="fa fa-print"></i></button>
 				</div>
 
 				<div class="mediaWidth flexParent">
@@ -135,7 +134,6 @@
 					</div>
 				</div>
 
-<!--				<input class="btn" name="search" type="submit" value="Поиск" />-->
 			</form>
 
 			<div class="mediaWidth" style="display: none;">
@@ -146,6 +144,9 @@
 			</div>
 		</div>
 
+		<div id="locked_container">
+			{% include "locked_cards.html" %}
+		</div>
 		<div id="cards_container">
 			{% include "cards.html" %}
 		</div>
@@ -204,6 +205,7 @@
 				for (var i = 0; i < schools_ids.length; i++) {
 					if ($(schools_ids[i]).prop("checked")) {
 						schools_books_cast_times = schools_books_cast_times + "&schools=" + $(schools_ids[i]).val();
+						console.log($(schools_ids[i]).val());
 					}
 				}
 

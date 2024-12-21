@@ -1,6 +1,8 @@
-<div class="cardContainer cardView {{style}}" style="width: 225px;">
+<div class="cardContainer cardView {{card.style}}" style="width: 225px;">
     <div class="spellCard">
         <div class="spellCard-content">
+            <span title="Открепить обратно" class="bUnlockItem" style="display: none;"><i aria-hidden="true" class="fa fa-unlock-alt"></i></span>
+            <span title="Закрепить заклинание)" class="bLockItem"><i aria-hidden="true" class="fa fa-lock"></i></span>
             <h1 title="{{card.title_eng}}"
                 {% if card.name_font_size %}
                     style="font-size: {{card.name_font_size}}px"
