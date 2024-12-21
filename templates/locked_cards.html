@@ -2,14 +2,14 @@
 {% block content %}
 <body>
 	<div class='p_cont' ref="cardContainer">
-		<div class="row spellContainer">
+		<div id="inner_locked_cards_container" class="row spellContainer">
 			{% for card in locked_cards %}
 				{% if card.style == 'Item' %}
 					{% include "tentaculus/item_card.html" %}
 				{% else %}
 					{% include "tentaculus/spell_card.html" %}
 				{% endif %}
-				{% if card.second_side and card.second_side.style %}
+				{% if card.second_side and card.second_side.style == "Item"%}
 					{% include "tentaculus/item_card.html" with card=card.second_side %}
 				{% elif card.second_side %}
 					{% include "tentaculus/spell_card.html" with card=card.second_side %}
@@ -17,23 +17,30 @@
 			{% endfor %}
 		</div>
 	</div>
-<!--	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>-->
-<!--	<script>-->
-<!--		$(".bLockItem").click(function () {-->
-<!--			console.log('Здесь');-->
-<!--			console.log($(this).parent().parent().parent());-->
-<!--			console.log($(this).parent().parent().parent().prop("class"));-->
-<!--			var card_name = $(this).siblings("h1")[0].innerText;-->
-<!--			var hidden_field_value = $("#locked_to_print").prop("value") + ", " + card_name + "|" + $(this).parent().parent().parent().prop("class").split(" ")[2];-->
-<!--			$("#locked_to_print").prop("value", hidden_field_value);-->
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script>
+		$(".bUnlockItem").click(function () {
+			var locked_to_print = $("#locked_to_print").prop("value");
 
-<!--			$.ajax({-->
-<!--				url: `/ajax-locked-block?locked_to_print=${locked_to_print}`,-->
-<!--				success: function (data) {-->
-<!--					$("#locked_container").html(data);-->
-<!--				}-->
-<!--			});-->
-<!--		});-->
-<!--	</script>-->
+			var card_name = $(this).siblings("h1")[0].innerText;
+			var str_to_delete = ", " + card_name + "|" + $(this).parent().parent().parent().prop("class").split(" ")[2];
+			str_to_delete = str_to_delete.replace(".", "\.").replace("|", "\\|");
+
+			var locked_to_print = locked_to_print.split(new RegExp(str_to_delete + '(.*)'));
+			locked_to_print = locked_to_print[0] ? locked_to_print[0] : '' + locked_to_print[1] ? locked_to_print[1] : ''
+
+			$("#locked_to_print").prop("value", locked_to_print);
+			if (locked_to_print == '') {
+				locked_to_print = 'empty';
+			}
+
+			$.ajax({
+				url: `/ajax-locked-block?locked_to_print=${locked_to_print}`,
+				success: function (data) {
+					$("#locked_container").html(data);
+				}
+			});
+		});
+	</script>
 </body>
 {% endblock %}

@@ -111,6 +111,8 @@ def get_locked_cards_info(cards_names):
     :param cards_names: Строка, объединённых через запятую имён залоченных карт
     """
     cards = []
+    if cards_names == 'empty':
+        cards_names = ''
     cards_names = (card_name.strip() for card_name in cards_names.split(', ') if card_name)
     for card_name in cards_names:
         card_name, style = card_name.split('|')

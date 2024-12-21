@@ -1170,6 +1170,12 @@ p {
 #lockedItemsArea .bHideItem {
   display: none;
 }
+#inner_cards_container > div > div > div > .bUnlockItem {
+    display: none;
+}
+#inner_locked_cards_container > div > div > div > .bLockItem {
+    display: none;
+}
 .bHideItem,
 .bLockItem,
 .bUnlockItem {
