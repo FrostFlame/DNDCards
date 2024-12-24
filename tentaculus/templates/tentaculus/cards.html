@@ -21,7 +21,7 @@
 	<script>
 		$(".bLockItem").click(function () {
 			var card_name = $(this).siblings("h1")[0].innerText;
-			var hidden_field_value = $("#locked_to_print").prop("value") + ", " + card_name + "|" + $(this).parent().parent().parent().prop("class").split(" ")[2];
+			var hidden_field_value = $("#locked_to_print").prop("value") + ", " + card_name + "|" + $(this).siblings('.class').text().trim();
 			$("#locked_to_print").prop("value", hidden_field_value);
 
 			$.ajax({

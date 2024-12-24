@@ -120,8 +120,10 @@ def get_locked_cards_info(cards_names):
             card_name = ''.join(card_name.split('. ')[1:])
         card = Card.objects.get(name__iexact=card_name)
 
-        if card.style == 'Default':
-            card.style = style
+        if card.style == 'Default' and style:
+            style = Source.objects.get(name=style)
+            card.style = style.style
+            card.source = style.name
         cards.append(card)
 
     cards, pdf_orientation = sort_cards(cards)
