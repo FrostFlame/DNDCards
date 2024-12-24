@@ -1,7 +1,11 @@
-from django.db.models import Q
+import re
 
-from tentaculus.forms import SearchForm
-from tentaculus.models import Card, SubClass, DndClass, Spell
+from django.db.models import Q
+from pathlib import Path
+
+from tentaculus.forms import SearchForm, ConvertFileForm
+from tentaculus.models import Card, SubClass, DndClass, Spell, Book, CastTime, Distance, Component, Duration, Source, \
+    Race, SubRace
 
 
 def get_cards_info(request):
@@ -22,17 +26,18 @@ def get_cards_info(request):
     name = data.get('name')
     dnd_class = data.get('dnd_class')
     subclass = data.get('subclass')
+    race = data.get('race')
+    subrace = data.get('subrace')
     circle_from = int(data.get('circle_from'))
     circle_to = int(data.get('circle_to'))
     style = ''
-    source_class = ''
-    source_subclass = ''
+    source = ''
     schools = data.getlist('schools')
     books = data.getlist('books')
     cast_times = data.getlist('cast_times')
     is_ritual = data.get('is_ritual') == 'true'
 
-    if dnd_class or circle_from >= 0 or circle_to >= 0 or schools or cast_times or is_ritual:
+    if dnd_class or race or circle_from >= 0 or circle_to >= 0 or schools or cast_times or is_ritual:
         ### Блок обработки заклинаний
         cards = Spell.objects.all()
         if dnd_class:
@@ -40,17 +45,34 @@ def get_cards_info(request):
             filters = Q(classes=dnd_class)
             class_instance = DndClass.objects.get(id=dnd_class)
             form.fields['subclass'].queryset = class_instance.subclasses.all()
-            source_class = class_instance.name
+            source = class_instance.name
 
             if subclass:
                 ### Если известен ещё и сабкласс
-                source_subclass = SubClass.objects.get(id=subclass).name
+                source = SubClass.objects.get(id=subclass).name
                 filters = filters | Q(subclasses=subclass)
 
                 form.fields['subclass'].initial = subclass
             cards = cards.filter(filters).distinct()
 
             style = class_instance.style
+
+        if race:
+            ### Если известна только раса, а сабраса не указана
+            filters = Q(race=race)
+            race_instance = Race.objects.get(id=race)
+            form.fields['subrace'].queryset = race_instance.subraces.all()
+            source = race_instance.name
+
+            if subrace:
+                ### Если известна ещё и сабраса
+                source = SubRace.objects.get(id=subrace).name
+                filters = filters | Q(subclasses=subrace)
+
+                form.fields['subrace'].initial = subrace
+            cards = cards.filter(filters).distinct()
+
+            style = race_instance.style
 
         if circle_from >= 0:
             cards = cards.filter(circle__gte=circle_from)
@@ -66,13 +88,6 @@ def get_cards_info(request):
 
         if is_ritual:
             cards = cards.filter(is_ritual=True)
-
-        for card in cards:
-            card.source = (
-                source_subclass
-                if subclass and int(subclass) in card.subclasses.values_list('id', flat=True)
-                else source_class
-            )
 
     else:
         ### Блок обработки всего вместе
@@ -95,9 +110,12 @@ def get_cards_info(request):
         if card.style == 'Default':
             card.style = style
 
+        card.source = source
+
     context = {
         'cards': cards,
         'form': form,
+        'convert_form': ConvertFileForm(),
         'pdf_orientation': pdf_orientation,
     }
 
@@ -159,3 +177,90 @@ def sort_cards(cards):
         result_cards.extend(ones[len(twos):])
 
     return result_cards, landscape_orientation
+
+
+def convert(request):
+    """
+    Конвертирование загруженного файла в сущность БД
+    """
+    obsidian_root = 'D:\Dnd\Obsidian\Кирания'
+    search_word = request.POST.get('file_name')
+
+    message = ''
+    for path in Path(obsidian_root).glob(f'**/*.md'):
+        if search_word.lower() in str(path).lower():
+            if '\\заклинания\\' in str(path).lower():
+                message += convert_spell(path)
+
+    return message or 'Не найдено такого файла'
+
+
+def convert_spell(path):
+    """
+    Конвертация файла заклинания
+    """
+    with open(path, 'r+', encoding='utf-8') as file:
+        text = file.read()
+        text = text.replace(u'\xa0', ' ').replace('Длительность: **Мгновенная**', 'Длительность: **Мгновенно**')
+        file.seek(0)
+        file.write(text)
+
+    with open(path, 'r', encoding='utf-8') as file:
+        file.seek(0)
+        file_lines = list(file)
+        title_eng = re.findall(r'#.+\[(.+)]', text)[0]
+        name = re.findall(r'# (.+) \[', text)[0]
+        description = None
+        book = re.findall(r'Источник: «(.*)»', text)[0]
+        try:
+            book = Book.objects.get(title_eng=book)  # noqa
+        except Book.DoesNotExist as e:  # noqa
+            return f'{name}: Обнаружена новая несуществующая книга: {book}'
+        circle = re.findall(r'\n(.+), \[\[', text)[0]
+        circle = 0 if circle == 'Заговор' else int(circle.split(' ')[0])
+        is_ritual = True if re.findall(r'# Ритуал', text) else False
+        cast_time = re.findall(r'Время накладывания: \*\*(.+)\*\*', text)[0]
+        try:
+            cast_time = CastTime.objects.get(name=cast_time)  # noqa
+        except CastTime.DoesNotExist as e:  # noqa
+            return f'{name}: Обнаружено новое время накладывания: {cast_time}'
+        distance = re.findall(r'Дистанция: \*\*(.+)\*\*', text)[0]
+        try:
+            distance = Distance.objects.get(name=distance)  # noqa
+        except Distance.DoesNotExist as e:  # noqa
+            return f'{name}: Обнаружена новая дистанция: {distance}'
+        components = [
+            component.strip('**')[0] for component in re.findall(r'Компоненты: \*\*(.*)\*\*', text)[0].split(', ')
+        ]
+        for comp in Component:
+            if all([letter in comp for letter in components]):
+                components = comp
+                break
+        material_component = re.findall(r'Компоненты: .+\((.*)\)', text)
+        duration = re.findall(r'Длительность: \*\*(.+)\*\*', text)[0]
+        try:
+            duration = Duration.objects.get(name=duration)  # noqa
+        except Duration.DoesNotExist as e:  # noqa
+            return f'{name}: Обнаружена новая длительность: {duration}'
+        classes_str = re.findall(r'Классы: (.*)', text)[0].split(', ')
+        classes_obj = []
+        for dnd_class in classes_str:
+            dnd_class = dnd_class.strip('[[').strip(']]')
+            try:
+                dnd_class = DndClass.objects.get(name=dnd_class)  # noqa
+                classes_obj.append(dnd_class)
+            except DndClass.DoesNotExist as e:  # noqa
+                return f'{name}: Обнаружен новый класс: {dnd_class}'
+        subclasses_str = re.findall(r'.*?\#(.*?)\|.*?', re.findall(r'Архетипы: .*\n', text)[0])
+        subclasses_obj = []
+        for subclass in subclasses_str:
+            try:
+                subclass = SubClass.objects.get(name=subclass)
+                subclasses_obj.append(subclass)
+            except SubClass.DoesNotExist as e:
+                    return f'{name}: Обнаружен новый сабкласс: {subclass}'
+        races = []
+        subraces = []
+        schools = []
+
+    return 'Файлы конвертированы'

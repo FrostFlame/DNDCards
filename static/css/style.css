@@ -1626,7 +1626,6 @@ p {
 .Wizard .spellCard .row .cell:last-of-type {
   border-left-color: #f44336;
 }
-/*Расы*/
 .Aasimar .spellCard {
   background-color: #e6c300;
   border-color: #e6c300;
@@ -1645,6 +1644,7 @@ p {
 }
 .Aasimar .spellCard .row .cell:last-of-type {
   border-left-color: #e6c300;
+}
 .Item .spellCard {
   background-color: grey;
   border-color: grey;

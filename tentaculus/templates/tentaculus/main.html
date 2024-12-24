@@ -51,6 +51,24 @@
 				</div>
 
 				<div class="mediaWidth">
+					<div id="RaceSelect">
+						<label class="filterLabel">{{ form.race.label }}</label>
+						<div>
+							{{ form.race }}
+						</div>
+					</div>
+				</div>
+
+				<div class="mediaWidth">
+					<div id="SubRaceSelect">
+						<label class="filterLabel">{{ form.subrace.label }}</label>
+						<div class="customSelect">
+							{{ form.subrace }}
+						</div>
+					</div>
+				</div>
+
+				<div class="mediaWidth">
 					<label class="filterLabel">Уровень с/по</label>
 					<div class="row">
 						<div class="cell">
@@ -136,19 +154,36 @@
 
 			</form>
 
-			<div class="mediaWidth" style="display: none;">
-				<label class="filterLabel">Скрытые заклинания (0)</label>
-				<div id="HiddenItems">
-					<a href="https://tentaculus.ru/spells/index.html#" class="bReturnUnvisible">Вернуть все обратно</a>
+			<form id="convert_form" action="/convert_file/" method="post">
+				{% csrf_token %}
+				<div class="mediaWidth">
+					<div id="FileNameInput">
+						<label class="filterLabel">{{ convert_form.file_name.label }}</label>
+						<div style="display: flex;">
+							<div class="customInput">
+								{{ convert_form.file_name }}
+							</div>
+						</div>
+					</div>
 				</div>
-			</div>
+				<div class="mediaWidth">
+					<div id="MessageBox">
+						<div style="display: flex;">
+							<div id="Message"></div>
+						</div>
+					</div>
+				</div>
+				<div class="mediaWidth flexParent">
+					<button type="submit" class="btn-link bt flexChild"><i aria-hidden="true">Конвертировать</i></button>
+				</div>
+			</form>
 		</div>
 
 		<div id="locked_container">
-			{% include "locked_cards.html" %}
+			{% include "tentaculus/locked_cards.html" %}
 		</div>
 		<div id="cards_container">
-			{% include "cards.html" %}
+			{% include "tentaculus/cards.html" %}
 		</div>
 	</div>
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
@@ -168,8 +203,23 @@
 
 		});
 
+		$("#id_race").change(function () {
+			var raceId = $(this).val();
+
+			$.ajax({
+				url: '/ajax-subraces',
+				data: {
+					'race': raceId
+				},
+				success: function (data) {
+					$("#id_subrace").html(data);
+				}
+			});
+
+		});
+
 		function ajax_search() {
-			let ids = "#id_name, #id_dnd_class, #id_subclass, #id_circle_from, #id_circle_to, #id_schools, #id_books, #id_cast_times, #id_is_ritual"
+			let ids = "#id_name, #id_dnd_class, #id_subclass, #id_race, #id_subrace, #id_circle_from, #id_circle_to, #id_schools, #id_books, #id_cast_times, #id_is_ritual"
 
 			var children = $("#schools").children();
 			var schools_ids = [];
@@ -197,6 +247,8 @@
 				var name = $("#id_name").val();
 				var dnd_class = $("#id_dnd_class").val();
 				var subclass = $("#id_subclass").val();
+				var race = $("#id_race").val();
+				var subrace = $("#id_subrace").val();
 				var circle_from = $("#id_circle_from").val();
 				var circle_to = $("#id_circle_to").val();
 				var is_ritual = $("#id_is_ritual").prop("checked");
@@ -221,7 +273,7 @@
 				}
 
 				$.ajax({
-					url: `/ajax-search?name=${name}&dnd_class=${dnd_class}&subclass=${subclass}&circle_from=${circle_from}&circle_to=${circle_to}${schools_books_cast_times}&is_ritual=${is_ritual}`,
+					url: `/ajax-search?name=${name}&dnd_class=${dnd_class}&subclass=${subclass}&race=${race}&subrace=${subrace}&circle_from=${circle_from}&circle_to=${circle_to}${schools_books_cast_times}&is_ritual=${is_ritual}`,
 					success: function (data) {
 						$("#cards_container").html(data);
 					}
@@ -231,6 +283,21 @@
 		}
 
 		ajax_search();
+
+		$("#convert_form").on('submit', function (event) {
+			event.preventDefault();
+
+			$.ajax({
+				url: '/ajax-convert-file',
+				type: 'POST',
+				data: $(this).serialize(),
+				dataType: 'json',
+				success: function (data) {
+					$("#Message").text(data.message);
+				},
+			});
+
+		});
 
 		$("#schools_label, #schools_arrows").click(function () {
 			$('#schools').toggle();

@@ -1,13 +1,13 @@
 import os
-from tempfile import template
 
 from asgiref.sync import async_to_sync
 from django.http import HttpResponse
+from django.http.response import JsonResponse
 from django.shortcuts import render
 
-from tentaculus.forms import SearchForm
-from tentaculus.funcs import get_cards_info
-from tentaculus.models import Item, Spell, Card, DndClass, SubClass, Circle
+from tentaculus.forms import SearchForm, ConvertFileForm
+from tentaculus.funcs import get_cards_info, convert
+from tentaculus.models import Item, Spell, Card, DndClass, SubClass, Circle, Race, SubRace
 
 from pyppeteer import launch
 
@@ -27,16 +27,17 @@ def all_cards(request):
     context = {
         'cards': cards,
         'form': form,
+        'convert_form': ConvertFileForm(),
     }
-    return render(request, 'main.html', context)
+    return render(request, 'tentaculus/main.html', context)
 
 
 def cards_block(request):
     context = get_cards_info(request)
     if request.GET.get('locked_to_print'):
-        template_name = 'locked_cards.html'
+        template_name = 'tentaculus/locked_cards.html'
     else:
-        template_name = 'cards.html'
+        template_name = 'tentaculus/cards.html'
 
     return render(request, template_name, context)
 
@@ -52,8 +53,9 @@ def all_spells(request):
     context = {
         'cards': spells,
         'form': form,
+        'convert_form': ConvertFileForm(),
     }
-    return render(request, 'main.html', context)
+    return render(request, 'tentaculus/main.html', context)
 
 
 def all_items(request):
@@ -68,7 +70,7 @@ def all_items(request):
         'cards': items,
         'form': form,
     }
-    return render(request, 'main.html', context)
+    return render(request, 'tentaculus/main.html', context)
 
 
 def search(request):
@@ -76,7 +78,7 @@ def search(request):
     Поиск
     """
     context = get_cards_info(request)
-    return render(request, 'cards.html', context)
+    return render(request, 'tentaculus/cards.html', context)
 
 
 def update_locked_block(request):
@@ -84,7 +86,7 @@ def update_locked_block(request):
     Апдейт залоченных карт
     """
     context = get_cards_info(request)
-    return render(request, 'locked_cards.html', context)
+    return render(request, 'tentaculus/locked_cards.html', context)
 
 
 def print_pdf(request):
@@ -104,7 +106,19 @@ def load_subclasses(request):
         dnd_subclasses = DndClass.objects.get(id=class_id).subclasses.all()
     else:
         dnd_subclasses = SubClass.objects.none()
-    return render(request, 'tentaculus/subclasses.html', {'subclasses': dnd_subclasses})
+    return render(request, 'tentaculus/suboptions.html', {'suboptions': dnd_subclasses})
+
+
+def load_subraces(request):
+    """
+    AJAX подгрузка карт по фильтру подрасы
+    """
+    race_id = request.GET.get('race')
+    if race_id:
+        subraces = Race.objects.get(id=race_id).subraces.all()
+    else:
+        subraces = SubRace.objects.none()
+    return render(request, 'tentaculus/suboptions.html', {'suboptions': subraces})
 
 
 async def get_pdf(request, pdf_orientation):
@@ -116,6 +130,8 @@ async def get_pdf(request, pdf_orientation):
         f'name={request.GET.get("name")}'
         f'&dnd_class={request.GET.get("dnd_class")}'
         f'&subclass={request.GET.get("subclass")}'
+        f'&race={request.GET.get("race")}'
+        f'&subrace={request.GET.get("subrace")}'
         f'&circle_from={request.GET.get("circle_from")}'
         f'&circle_to={request.GET.get("circle_to")}'
         f'{("&schools=" + request.GET.getlist("schools")) if request.GET.getlist("schools") else ""}'
@@ -142,3 +158,20 @@ async def get_pdf(request, pdf_orientation):
             return response
     except:
         return all_cards(request())
+
+
+def convert_file(request):
+    """
+    Создание сущности в БД из файла obsidian.md
+    """
+
+    if request.method == "POST":
+        form = ConvertFileForm(request.POST)
+        if form.is_valid():
+            message = convert(request)
+        else:
+            message = 'Невалидная форма'
+    else:
+        message = ''
+
+    return JsonResponse({'success': True, 'message': message})

@@ -2,7 +2,7 @@ from audioop import reverse
 
 from django import forms
 
-from tentaculus.models import DndClass, Circle, School, Book, CastTime
+from tentaculus.models import DndClass, Circle, School, Book, CastTime, Race, SubRace
 
 
 class SearchForm(forms.Form):
@@ -19,6 +19,20 @@ class SearchForm(forms.Form):
         empty_label='Все',
         queryset=DndClass.objects.none(),
         widget=forms.Select(attrs={'class':'customSelect', 'style': 'padding: .5em .2em'}),
+        required=False
+    )
+    race = forms.ModelChoiceField(
+        label='Раса',
+        empty_label='---',
+        queryset=Race.objects.order_by('name'),
+        widget=forms.Select(attrs={'class': 'customSelect', 'style': 'padding: .5em .2em'}),
+        required=False
+    )
+    subrace = forms.ModelChoiceField(
+        label='Подраса',
+        empty_label='---',
+        queryset=SubRace.objects.none(),
+        widget=forms.Select(attrs={'class': 'customSelect', 'style': 'padding: .5em .2em'}),
         required=False
     )
     circle_from = forms.ChoiceField(
@@ -50,5 +64,13 @@ class SearchForm(forms.Form):
     )
     is_ritual = forms.BooleanField(
         label='Ритуальные заклинания',
+        required=False
+    )
+
+
+class ConvertFileForm(forms.Form):
+    file_name = forms.CharField(
+        label='Название файла',
+        max_length=100,
         required=False
     )

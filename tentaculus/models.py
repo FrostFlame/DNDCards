@@ -88,7 +88,7 @@ class Item(Card):
         return ', '.join([item_type.name for item_type in self.item_types.all()])
 
 class CastTime(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
@@ -107,6 +107,7 @@ class Duration(models.Model):
 
 class Book(models.Model):
     title = models.CharField(max_length=100)
+    title_eng = models.CharField(max_length=100)
     short = models.CharField(max_length=10)
 
     def __str__(self):
@@ -126,6 +127,13 @@ class DndClass(Source):
 
 class SubClass(Source):
     base_class = models.ForeignKey(DndClass, related_name='subclasses', on_delete=models.CASCADE, blank=True, null=True)
+
+    @property
+    def style(self):
+        return self.base_class.style  # noqa
+
+    def __str__(self):
+        return f'{self.name} ({self.base_class.name})'
 
 class Race(Source):
     style = models.CharField(max_length=20, null=True, blank=True)
