@@ -290,6 +290,10 @@ def convert_spell(path):
                 break
 
         material_component = re.findall(r'Компоненты: .+\((.*)\)', text)
+        if material_component:
+            material_component = material_component[0]
+        else:
+            material_component = None
 
         duration = re.findall(r'Длительность: \*\*(.+)\*\*', text)[0]
         try:
