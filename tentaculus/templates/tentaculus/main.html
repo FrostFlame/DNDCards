@@ -190,6 +190,7 @@
 	<script>
 		$("#id_dnd_class").change(function () {
 			var classId = $(this).val();
+			$("#id_subclass").val("");
 
 			$.ajax({
 				url: '/ajax-subclasses',
@@ -205,6 +206,7 @@
 
 		$("#id_race").change(function () {
 			var raceId = $(this).val();
+			$("#id_subrace").val("");
 
 			$.ajax({
 				url: '/ajax-subraces',

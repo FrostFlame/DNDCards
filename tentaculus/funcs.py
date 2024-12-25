@@ -31,25 +31,27 @@ def get_cards_info(request):
     circle_from = int(data.get('circle_from'))
     circle_to = int(data.get('circle_to'))
     style = ''
-    source = ''
     schools = data.getlist('schools')
     books = data.getlist('books')
     cast_times = data.getlist('cast_times')
     is_ritual = data.get('is_ritual') == 'true'
 
-    if dnd_class or race or circle_from >= 0 or circle_to >= 0 or schools or cast_times or is_ritual:
+    if is_spell(data):
         ### Блок обработки заклинаний
         cards = Spell.objects.all()
+
+        source_class = None
+        source_subclass = None
         if dnd_class:
             ### Если известен только класс, а сабкласс не указан
             filters = Q(classes=dnd_class)
             class_instance = DndClass.objects.get(id=dnd_class)
             form.fields['subclass'].queryset = class_instance.subclasses.all()
-            source = class_instance.name
+            source_class = class_instance.name
 
             if subclass:
                 ### Если известен ещё и сабкласс
-                source = SubClass.objects.get(id=subclass).name
+                source_subclass = SubClass.objects.get(id=subclass).name
                 filters = filters | Q(subclasses=subclass)
 
                 form.fields['subclass'].initial = subclass
@@ -57,16 +59,18 @@ def get_cards_info(request):
 
             style = class_instance.style
 
+        source_race = None
+        source_subrace = None
         if race:
-            ### Если известна только раса, а сабраса не указана
+            ### Если известна только раса, а подраса не указана
             filters = Q(race=race)
             race_instance = Race.objects.get(id=race)
             form.fields['subrace'].queryset = race_instance.subraces.all()
-            source = race_instance.name
+            source_race = race_instance.name
 
             if subrace:
-                ### Если известна ещё и сабраса
-                source = SubRace.objects.get(id=subrace).name
+                ### Если известна ещё и подраса
+                source_subrace = SubRace.objects.get(id=subrace).name
                 filters = filters | Q(subclasses=subrace)
 
                 form.fields['subrace'].initial = subrace
@@ -110,7 +114,19 @@ def get_cards_info(request):
         if card.style == 'Default':
             card.style = style
 
-        card.source = source
+        if is_spell(data):
+            if source_class:  # noqa
+                card.source = (
+                    source_subclass  # noqa
+                    if subclass and int(subclass) in card.subclasses.values_list('id', flat=True)
+                    else source_class  # noqa
+                )
+            elif source_race:  # noqa
+                card.source = (
+                    source_subrace  # noqa
+                    if subrace and int(subrace) in card.subrace.values_list('id', flat=True)
+                    else source_race  # noqa
+                )
 
     context = {
         'cards': cards,
@@ -120,6 +136,18 @@ def get_cards_info(request):
     }
 
     return context
+
+
+def is_spell(data):
+    dnd_class = data.get('dnd_class')
+    race = data.get('race')
+    circle_from = int(data.get('circle_from'))
+    circle_to = int(data.get('circle_to'))
+    schools = data.getlist('schools')
+    cast_times = data.getlist('cast_times')
+    is_ritual = data.get('is_ritual') == 'true'
+
+    return dnd_class or race or circle_from >= 0 or circle_to >= 0 or schools or cast_times or is_ritual
 
 
 def get_locked_cards_info(cards_names):
