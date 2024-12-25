@@ -215,10 +215,18 @@ def convert(request):
     search_word = request.POST.get('file_name')
 
     message = ''
+    at_least_one = False
     for path in Path(obsidian_root).glob(f'**/*.md'):
         if search_word.lower() in str(path).lower():
+            at_least_one = True
             if '\\заклинания\\' in str(path).lower():
-                message += convert_spell(path)
+                try:
+                     message += convert_spell(path)
+                except Exception as e:
+                    return f'Что-то пошло совсем не так: {str(path)}'
+
+    if not message and at_least_one:
+        message = 'Выполнено'
 
     return message or 'Не найдено такого файла'
 
@@ -234,10 +242,34 @@ def convert_spell(path):
         file.write(text)
 
     with open(path, 'r', encoding='utf-8') as file:
-        file.seek(0)
-        # file_lines = list(file)
+        text = file.read()
+
         title_eng = re.findall(r'#.+\[(.+)]', text)[0]
         name = re.findall(r'# (.+) \[', text)[0]
+
+        circle, *schools_str = (re.findall(r'.*?, .*\]\]', text)[0].split(', '))  # noqa
+        circle = 0 if circle == 'Заговор' else int(circle.split(' ')[0])
+
+        schools = []
+        for school in schools_str:
+            school = school.strip('[[').strip(']]')
+            try:
+                school = School.objects.get(name=school)  # noqa
+                schools.append(school)
+            except School.DoesNotExist as e:  # noqa
+                return f'{name}: Обнаружена новая несуществующая школа: {school}\n'
+
+        text_split = re.split('\[\[|]]', text)
+        text = ''
+        is_inside = False
+        for string in text_split:
+            if is_inside and '|' in string:
+                string = re.findall(r'.*?\|(.*)', string)[0]
+
+            text += string
+            is_inside = not is_inside
+
+        text = ''.join(text)
 
         description_split = re.findall(re.compile(r'Источник.+?\n\n(.*)', re.S), text)[0].replace('\n', '<br>').replace('d', 'к').split('**')
         description = ''
@@ -255,18 +287,6 @@ def convert_spell(path):
         except Book.DoesNotExist as e:  # noqa
             return f'{name}: Обнаружена новая несуществующая книга: {book}\n'
 
-        circle, *schools_str = (re.findall(r'.*?, .*\]\]', text)[0].split(', '))
-        circle = 0 if circle == 'Заговор' else int(circle.split(' ')[0])
-
-        schools = []
-        for school in schools_str:
-            school = school.strip('[[').strip(']]')
-            try:
-                school = School.objects.get(name=school)  # noqa
-                schools.append(school)
-            except School.DoesNotExist as e:  # noqa
-                return f'{name}: Обнаружена новая несуществующая школа: {school}\n'
-
         is_ritual = True if re.findall(r'# Ритуал', text) else False
 
         cast_time = re.findall(r'Время накладывания: \*\*(.+)\*\*', text)[0]
@@ -282,7 +302,7 @@ def convert_spell(path):
             return f'{name}: Обнаружена новая дистанция: {distance}\n'
 
         components = [
-            component.strip('**')[0] for component in re.findall(r'Компоненты: \*\*(.*)\*\*', text)[0].split(', ')
+            component.strip('**')[0] for component in re.findall(r'Компоненты: (.*)\*\*', text)[0].split(', ')
         ]
         for comp in Component:
             if all([letter in comp for letter in components]):
@@ -295,8 +315,9 @@ def convert_spell(path):
         else:
             material_component = None
 
-        duration = re.findall(r'Длительность: \*\*(.+)\*\*', text)[0]
+        duration = re.findall(r'Длительность: \*\*(.*)\*\*', text)[0]
         try:
+            duration = duration.replace('**', '').replace('Концентрация', 'Конц.').replace('Вплоть до', 'До')
             duration = Duration.objects.get(name=duration)  # noqa
         except Duration.DoesNotExist as e:  # noqa
             return f'{name}: Обнаружена новая длительность: {duration}\n'
@@ -306,7 +327,6 @@ def convert_spell(path):
         if classes_str:
             classes_str = classes_str[0].split(', ')
             for dnd_class in classes_str:
-                dnd_class = dnd_class.strip('[[').strip(']]')
                 try:
                     dnd_class = DndClass.objects.get(name=dnd_class)  # noqa
                     classes_obj.append(dnd_class)
@@ -373,4 +393,4 @@ def convert_spell(path):
         spell.race.add(*races_obj)
         spell.subrace.add(*subraces_obj)
 
-    return f'{name} {"+" if created else "*"}\n'
+    return ''
