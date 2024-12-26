@@ -20,11 +20,7 @@
                     <span>{{card.types}}</span>
                 </div>
             </div>
-            <div contenteditable="true" class="text"
-                {% if card.font_size %}
-                    style="font-size: {{card.font_size}}px;"
-                {% endif %}
-            >
+            <div contenteditable="true" class="text" style="font-size: {{card.font_size}}px;">
                 <p>
                     {{card.description|safe}}
                 </p>

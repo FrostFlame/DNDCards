@@ -146,7 +146,7 @@
 				</div>
 
 				<div class="mediaWidth">
-					<div id="RitualCheckbox" title="" class="customCheckbox">
+					<div id="RitualCheckbox" class="customCheckbox">
 						{{form.is_ritual}}
 						<span class="label">{{form.is_ritual.label}}</span>
 					</div>
@@ -187,8 +187,72 @@
 			{% include "tentaculus/cards.html" %}
 		</div>
 	</div>
-	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 	<script>
+		<!--		function ajax_search() {-->
+		let ids = "#id_name, #id_dnd_class, #id_subclass, #id_race, #id_subrace, #id_circle_from, #id_circle_to"
+
+		var children = $("#schools").children();
+		var schools_ids = [];
+		for (var i = 0; i < children.length; i++) {
+			field_id = "#" + children[i].children[0].id;
+			ids = ids + ", " + field_id;
+			schools_ids.push(field_id);
+		}
+		children = $("#books").children();
+		var books_ids = [];
+		for (var i = 0; i < children.length; i++) {
+			field_id = "#" + children[i].children[0].id;
+			ids = ids + ", " + field_id;
+			books_ids.push(field_id);
+		}
+		children = $("#cast_times").children();
+		var cast_times_ids = [];
+		for (var i = 0; i < children.length; i++) {
+			field_id = "#" + children[i].children[0].id;
+			ids = ids + ", " + field_id;
+			cast_times_ids.push(field_id);
+		}
+
+		$(ids).change(function (event) {
+			var name = $("#id_name").val();
+			var dnd_class = $("#id_dnd_class").val();
+			var subclass = $("#id_subclass").val();
+			var race = $("#id_race").val();
+			var subrace = $("#id_subrace").val();
+			var circle_from = $("#id_circle_from").val();
+			var circle_to = $("#id_circle_to").val();
+			var is_ritual = $("#id_is_ritual").prop("checked");
+
+			var schools_books_cast_times = "";
+			for (var i = 0; i < schools_ids.length; i++) {
+				if ($(schools_ids[i]).prop("checked")) {
+					schools_books_cast_times = schools_books_cast_times + "&schools=" + $(schools_ids[i]).val();
+				}
+			}
+
+			for (var i = 0; i < books_ids.length; i++) {
+				if ($(books_ids[i]).prop("checked")) {
+					schools_books_cast_times = schools_books_cast_times + "&books=" + $(books_ids[i]).val();
+				}
+			}
+
+			for (var i = 0; i < cast_times_ids.length; i++) {
+				if ($(cast_times_ids[i]).prop("checked")) {
+					schools_books_cast_times = schools_books_cast_times + "&cast_times=" + $(cast_times_ids[i]).val();
+				}
+			}
+
+			$.ajax({
+				url: `/ajax-search?name=${name}&dnd_class=${dnd_class}&subclass=${subclass}&race=${race}&subrace=${subrace}&circle_from=${circle_from}&circle_to=${circle_to}${schools_books_cast_times}&is_ritual=${is_ritual}`,
+				success: function (data) {
+					$("#cards_container").html(data);
+				}
+			});
+		});
+<!--		}-->
+<!--		ajax_search();-->
+
 		$("#id_dnd_class").change(function () {
 			var classId = $(this).val();
 			$("#id_subclass").val("");
@@ -220,72 +284,6 @@
 			});
 
 		});
-
-		function ajax_search() {
-			let ids = "#id_name, #id_dnd_class, #id_subclass, #id_race, #id_subrace, #id_circle_from, #id_circle_to, #id_schools, #id_books, #id_cast_times, #id_is_ritual"
-
-			var children = $("#schools").children();
-			var schools_ids = [];
-			for (var i = 0; i < children.length; i++) {
-				field_id = "#" + children[i].children[0].id;
-				ids = ids + ", " + field_id;
-				schools_ids.push(field_id);
-			}
-			children = $("#books").children();
-			var books_ids = [];
-			for (var i = 0; i < children.length; i++) {
-				field_id = "#" + children[i].children[0].id;
-				ids = ids + ", " + field_id;
-				books_ids.push(field_id);
-			}
-			children = $("#cast_times").children();
-			var cast_times_ids = [];
-			for (var i = 0; i < children.length; i++) {
-				field_id = "#" + children[i].children[0].id;
-				ids = ids + ", " + field_id;
-				cast_times_ids.push(field_id);
-			}
-
-			$(ids).change(function () {
-				var name = $("#id_name").val();
-				var dnd_class = $("#id_dnd_class").val();
-				var subclass = $("#id_subclass").val();
-				var race = $("#id_race").val();
-				var subrace = $("#id_subrace").val();
-				var circle_from = $("#id_circle_from").val();
-				var circle_to = $("#id_circle_to").val();
-				var is_ritual = $("#id_is_ritual").prop("checked");
-
-				var schools_books_cast_times = "";
-				for (var i = 0; i < schools_ids.length; i++) {
-					if ($(schools_ids[i]).prop("checked")) {
-						schools_books_cast_times = schools_books_cast_times + "&schools=" + $(schools_ids[i]).val();
-					}
-				}
-
-				for (var i = 0; i < books_ids.length; i++) {
-					if ($(books_ids[i]).prop("checked")) {
-						schools_books_cast_times = schools_books_cast_times + "&books=" + $(books_ids[i]).val();
-					}
-				}
-
-				for (var i = 0; i < cast_times_ids.length; i++) {
-					if ($(cast_times_ids[i]).prop("checked")) {
-						schools_books_cast_times = schools_books_cast_times + "&cast_times=" + $(cast_times_ids[i]).val();
-					}
-				}
-
-				$.ajax({
-					url: `/ajax-search?name=${name}&dnd_class=${dnd_class}&subclass=${subclass}&race=${race}&subrace=${subrace}&circle_from=${circle_from}&circle_to=${circle_to}${schools_books_cast_times}&is_ritual=${is_ritual}`,
-					success: function (data) {
-						$("#cards_container").html(data);
-					}
-				});
-
-			});
-		}
-
-		ajax_search();
 
 		$("#convert_form").on('submit', function (event) {
 			event.preventDefault();
@@ -321,7 +319,43 @@
 		});
 
 		$("#RitualCheckbox").click(function () {
-			$("#id_is_ritual").prop("checked", !$("#id_is_ritual").prop("checked")).trigger("change");
+			var value = $("#id_is_ritual").prop("checked");
+			$("#id_is_ritual").prop("checked", !value);
+
+			var name = $("#id_name").val();
+			var dnd_class = $("#id_dnd_class").val();
+			var subclass = $("#id_subclass").val();
+			var race = $("#id_race").val();
+			var subrace = $("#id_subrace").val();
+			var circle_from = $("#id_circle_from").val();
+			var circle_to = $("#id_circle_to").val();
+			var is_ritual = $("#id_is_ritual").prop("checked");
+
+			var schools_books_cast_times = "";
+			for (var i = 0; i < schools_ids.length; i++) {
+				if ($(schools_ids[i]).prop("checked")) {
+					schools_books_cast_times = schools_books_cast_times + "&schools=" + $(schools_ids[i]).val();
+				}
+			}
+
+			for (var i = 0; i < books_ids.length; i++) {
+				if ($(books_ids[i]).prop("checked")) {
+					schools_books_cast_times = schools_books_cast_times + "&books=" + $(books_ids[i]).val();
+				}
+			}
+
+			for (var i = 0; i < cast_times_ids.length; i++) {
+				if ($(cast_times_ids[i]).prop("checked")) {
+					schools_books_cast_times = schools_books_cast_times + "&cast_times=" + $(cast_times_ids[i]).val();
+				}
+			}
+
+			$.ajax({
+				url: `/ajax-search?name=${name}&dnd_class=${dnd_class}&subclass=${subclass}&race=${race}&subrace=${subrace}&circle_from=${circle_from}&circle_to=${circle_to}${schools_books_cast_times}&is_ritual=${is_ritual}`,
+				success: function (data) {
+					$("#cards_container").html(data);
+				}
+			});
 		});
 	</script>
 </body>

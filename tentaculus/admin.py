@@ -28,12 +28,16 @@ from tentaculus.models import (
 
 class CardChildAdmin(PolymorphicChildModelAdmin):
     base_model = Card
+    save_as = True
+    save_on_top = True
 
 
 @admin.register(Spell)
 class SpellAdmin(CardChildAdmin):
     base_model = Spell
     show_in_index = True
+    list_display = ['name', 'circle']
+    ordering = ('circle', 'name')
 
 
 @admin.register(Item)

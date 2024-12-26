@@ -38,7 +38,7 @@ def get_cards_info(request):
 
     if is_spell(data):
         ### Блок обработки заклинаний
-        cards = Spell.objects.all()
+        cards = Spell.objects.all().order_by('circle', 'name')
 
         source_class = None
         source_subclass = None
@@ -107,6 +107,8 @@ def get_cards_info(request):
 
     if books:
         cards = cards.filter(book__in=books)
+
+    cards = cards.filter(is_face_side=True)
 
     cards, pdf_orientation = sort_cards(cards)
 
@@ -271,15 +273,7 @@ def convert_spell(path):
 
         text = ''.join(text)
 
-        description_split = re.findall(re.compile(r'Источник.+?\n\n(.*)', re.S), text)[0].replace('\n', '<br>').replace('d', 'к').split('**')
-        description = ''
-        for i, string in enumerate(description_split):
-            description += string
-            if i % 2 == 0:
-                if i != len(description_split) - 1:
-                    description += '<b>'
-            else:
-                description += '</b>'
+        description = get_description(text)
 
         book = re.findall(r'Источник: «(.*)»', text)[0]
         try:
@@ -370,7 +364,6 @@ def convert_spell(path):
         defaults = {
             'title_eng': title_eng,
             'name': name,
-            'description': description,
             'book': book,
             'circle': circle,
             'is_ritual': is_ritual,
@@ -380,6 +373,9 @@ def convert_spell(path):
             'material_component': material_component,
             'duration': duration,
         }
+
+        if not Spell.objects.filter(title_eng=title_eng, name=name, second_side__isnull=False).exists():
+            defaults['description'] = description
 
         spell, created = Spell.objects.update_or_create(
             title_eng=title_eng,
@@ -394,3 +390,19 @@ def convert_spell(path):
         spell.subrace.add(*subraces_obj)
 
     return ''
+
+
+def get_description(text):
+    # fonts_config = ((11.25, 17, 33),)
+
+    description_split = re.findall(re.compile(r'Источник.+?\n\n(.*)', re.S), text)[0].replace('\n', '<br>').replace('d', 'к').split('**')
+    description = ''
+    for i, string in enumerate(description_split):
+        description += string
+        if i % 2 == 0:
+            if i != len(description_split) - 1:
+                description += '<b>'
+        else:
+            description += '</b>'
+
+    return description
