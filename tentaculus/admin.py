@@ -38,12 +38,16 @@ class SpellAdmin(CardChildAdmin):
     show_in_index = True
     list_display = ['name', 'circle']
     ordering = ('circle', 'name')
+    search_fields = ['name']
+    autocomplete_fields = ['second_side']
 
 
 @admin.register(Item)
 class ItemAdmin(CardChildAdmin):
     base_model = Item
     show_in_index = True
+    search_fields = ['name']
+    autocomplete_fields = ['second_side']
 
 
 @admin.register(Card)
@@ -51,6 +55,8 @@ class CardParentAdmin(PolymorphicParentModelAdmin):
     base_model = Card
     child_models = (Spell, Item)
     list_filter = (PolymorphicChildModelFilter,)
+    search_fields = ['name']
+    autocomplete_fields = ['second_side']
 
 
 class SourceChildAdmin(PolymorphicChildModelAdmin):

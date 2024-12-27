@@ -1,4 +1,4 @@
-<div class="cardContainer cardView {{card.style}}" style="width: 225px;">
+<div class="cardContainer cardView {% if second_side_style %} {{second_side_style}} {% else %} {{card.style}} {% endif %}" style="width: 225px;">
     <div class="spellCard">
         <div class="spellCard-content">
             <span title="Закрепить заклинание" class="bLockItem"><i aria-hidden="true" class="fa fa-lock"></i></span>
@@ -43,7 +43,7 @@
                     style="font-size: {{card.footer_font_size}}px"
                 {% endif %}
             >
-                {{card.source}}
+                {% if second_side_source %} {{second_side_source }} {% else %} {{card.source}} {% endif %}
             </b>
             <b class="school"
                 {% if card.footer_font_size %}

@@ -395,7 +395,7 @@ def convert_spell(path):
 def get_description(text):
     # fonts_config = ((11.25, 17, 33),)
 
-    description_split = re.findall(re.compile(r'Источник.+?\n\n(.*)', re.S), text)[0].replace('\n', '<br>').replace('d', 'к').split('**')
+    description_split = re.findall(re.compile(r'Источник.+?\n\n(.*)', re.S), text)[0].replace('\n', '<br>').replace('d', 'к').replace('<br>- ', '<br>• ').split('**')
     description = ''
     for i, string in enumerate(description_split):
         description += string

@@ -173,7 +173,7 @@
 				<div class="mediaWidth">
 					<div id="MessageBox">
 						<div style="display: flex;">
-							<div id="Message"></div>
+							<div id="message"></div>
 						</div>
 					</div>
 				</div>
@@ -287,6 +287,7 @@
 
 		$("#convert_form").on('submit', function (event) {
 			event.preventDefault();
+			$("#message").text('');
 
 			$.ajax({
 				url: '/ajax-convert-file',
@@ -294,7 +295,7 @@
 				data: $(this).serialize(),
 				dataType: 'json',
 				success: function (data) {
-					$("#Message").text(data.message);
+					$("#message").text(data.message);
 				},
 			});
 
