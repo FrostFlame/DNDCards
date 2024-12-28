@@ -1388,7 +1388,7 @@ p {
   height: 3.5in;
   background: #e01a10;
   border: 3px solid #e01a10;
-  border-bottom-width: 25px;
+  border-bottom-width: 20px;
   position: relative;
   color: #000;
 }
@@ -1457,7 +1457,7 @@ p {
 .spellCard .class {
   position: absolute;
   left: 1px;
-  bottom: -20px;
+  bottom: -18px;
   font-size: 70%;
   color: #fff;
   cursor: default;
@@ -1465,7 +1465,7 @@ p {
 .spellCard .school {
   position: absolute;
   right: 1px;
-  bottom: -20px;
+  bottom: -18px;
   font-size: 70%;
   color: #fff;
   cursor: default;

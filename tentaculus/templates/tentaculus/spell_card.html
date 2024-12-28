@@ -3,11 +3,7 @@
         <div class="spellCard-content">
             <span title="Закрепить заклинание" class="bLockItem"><i aria-hidden="true" class="fa fa-lock"></i></span>
             <span title="Открепить обратно" class="bUnlockItem"><i aria-hidden="true" class="fa fa-unlock-alt"></i></span>
-            <h1 title="{{card.title_eng}}"
-                {% if card.name_font_size %}
-                    style="font-size: {{card.name_font_size}}px"
-                {% endif %}
-            >
+            <h1 title="{{card.title_eng}}" style="font-size: {{card.name_font_size}}px">
                 {{card.circle}}. {{card.name}} {% if card.is_ritual %}(Ритуал) {% endif %}
             </h1>
             <div class="row">

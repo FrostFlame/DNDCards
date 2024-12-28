@@ -38,7 +38,7 @@ class Rarity(models.TextChoices):
 class Card(PolymorphicModel):
     title_eng = models.CharField(max_length=100)
     name = models.CharField(max_length=100)
-    name_font_size = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
+    name_font_size = models.DecimalField(default=14, max_digits=4, decimal_places=2)
     font_size = models.DecimalField(default=11.25, max_digits=4, decimal_places=2)
     description = models.TextField()
     footer_font_size = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
