@@ -101,22 +101,22 @@ class BookAdmin(admin.ModelAdmin):
 
 @admin.register(CastTime)
 class CastTimeAdmin(admin.ModelAdmin):
-    pass
+    ordering = ('name',)
 
 
 @admin.register(Distance)
 class DistanceAdmin(admin.ModelAdmin):
-    pass
+    ordering = ('name',)
 
 
 @admin.register(Duration)
 class DurationAdmin(admin.ModelAdmin):
-    pass
+    ordering = ('name',)
 
 
 @admin.register(School)
 class SchoolAdmin(admin.ModelAdmin):
-    pass
+    ordering = ('name',)
 
 
 @admin.register(Attunement)

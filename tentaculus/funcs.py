@@ -1,11 +1,9 @@
-import re
-
 from django.db.models import Q
 from pathlib import Path
 
+from tentaculus.converter import SpellConverter
 from tentaculus.forms import SearchForm, ConvertFileForm
-from tentaculus.models import Card, SubClass, DndClass, Spell, Book, CastTime, Distance, Component, Duration, Source, \
-    Race, SubRace, School
+from tentaculus.models import Card, SubClass, DndClass, Spell, Source, Race, SubRace
 
 
 def get_cards_info(request):
@@ -223,186 +221,11 @@ def convert(request):
             at_least_one = True
             if '\\заклинания\\' in str(path).lower():
                 try:
-                     message += convert_spell(path)
+                     message += SpellConverter(path).convert()
                 except Exception as e:
-                    return f'Что-то пошло совсем не так: {str(path)}'
+                    message += f'{str(path)}: {e.args[0]}'
 
     if not message and at_least_one:
         message = 'Выполнено'
 
     return message or 'Не найдено такого файла'
-
-
-def convert_spell(path):
-    """
-    Конвертация файла заклинания
-    """
-    with open(path, 'r+', encoding='utf-8') as file:
-        text = file.read()
-        text = text.replace(u'\xa0', ' ').replace('Длительность: **Мгновенная**', 'Длительность: **Мгновенно**')
-        file.seek(0)
-        file.write(text)
-
-    with open(path, 'r', encoding='utf-8') as file:
-        text = file.read()
-
-        title_eng = re.findall(r'#.+\[(.+)]', text)[0]
-        name = re.findall(r'# (.+) \[', text)[0]
-
-        circle, *schools_str = (re.findall(r'.*?, .*\]\]', text)[0].split(', '))  # noqa
-        circle = 0 if circle == 'Заговор' else int(circle.split(' ')[0])
-
-        schools = []
-        for school in schools_str:
-            school = school.strip('[[').strip(']]')
-            try:
-                school = School.objects.get(name=school)  # noqa
-                schools.append(school)
-            except School.DoesNotExist as e:  # noqa
-                return f'{name}: Обнаружена новая несуществующая школа: {school}\n'
-
-        text_split = re.split('\[\[|]]', text)
-        text = ''
-        is_inside = False
-        for string in text_split:
-            if is_inside and '|' in string:
-                string = re.findall(r'.*?\|(.*)', string)[0]
-
-            text += string
-            is_inside = not is_inside
-
-        text = ''.join(text)
-
-        description = get_description(text)
-
-        book = re.findall(r'Источник: «(.*)»', text)[0]
-        try:
-            book = Book.objects.get(title_eng=book)  # noqa
-        except Book.DoesNotExist as e:  # noqa
-            return f'{name}: Обнаружена новая несуществующая книга: {book}\n'
-
-        is_ritual = True if re.findall(r'# Ритуал', text) else False
-
-        cast_time = re.findall(r'Время накладывания: \*\*(.+)\*\*', text)[0]
-        try:
-            cast_time = CastTime.objects.get(name=cast_time)  # noqa
-        except CastTime.DoesNotExist as e:  # noqa
-            return f'{name}: Обнаружено новое время накладывания: {cast_time}\n'
-
-        distance = re.findall(r'Дистанция: \*\*(.+)\*\*', text)[0]
-        try:
-            distance = Distance.objects.get(name=distance)  # noqa
-        except Distance.DoesNotExist as e:  # noqa
-            return f'{name}: Обнаружена новая дистанция: {distance}\n'
-
-        components = [
-            component.strip('**')[0] for component in re.findall(r'Компоненты: (.*)\*\*', text)[0].split(', ')
-        ]
-        for comp in Component:
-            if all([letter in comp for letter in components]):
-                components = comp
-                break
-
-        material_component = re.findall(r'Компоненты: .+\((.*)\)', text)
-        if material_component:
-            material_component = material_component[0]
-        else:
-            material_component = None
-
-        duration = re.findall(r'Длительность: \*\*(.*)\*\*', text)[0]
-        try:
-            duration = duration.replace('**', '').replace('Концентрация', 'Конц.').replace('Вплоть до', 'До')
-            duration = Duration.objects.get(name=duration)  # noqa
-        except Duration.DoesNotExist as e:  # noqa
-            return f'{name}: Обнаружена новая длительность: {duration}\n'
-
-        classes_str = re.findall(r'Классы: (.*)', text)
-        classes_obj = []
-        if classes_str:
-            classes_str = classes_str[0].split(', ')
-            for dnd_class in classes_str:
-                try:
-                    dnd_class = DndClass.objects.get(name=dnd_class)  # noqa
-                    classes_obj.append(dnd_class)
-                except DndClass.DoesNotExist as e:
-                    return f'{name}: Обнаружен новый класс: {dnd_class}\n'
-
-        subclasses = re.findall(r'Архетипы: .*\n', text)
-        subclasses_obj = []
-        if subclasses:
-            subclasses_str = re.findall(r'.*?#(.*?)\|.*?', subclasses[0])
-            for subclass in subclasses_str:
-                try:
-                    subclass = SubClass.objects.get(name=subclass)
-                    subclasses_obj.append(subclass)
-                except SubClass.DoesNotExist as e:
-                    return f'{name}: Обнаружен новый сабкласс: {subclass}\n'
-
-        races_str = re.findall(r'Расы: (.*)', text)
-        races_obj = []
-        if races_str:
-            races_str = races_str[0].split(', ')
-            for race in races_str:
-                race = race.strip('[[').strip(']]')
-                try:
-                    race = Race.objects.get(name=race)  # noqa
-                    races_obj.append(race)
-                except Race.DoesNotExist as e:
-                    return f'{name}: Обнаружена новая раса: {race}\n'
-
-        subraces = re.findall(r'Подрасы: .*\n', text)
-        subraces_obj = []
-        if subraces:
-            subraces_str = re.findall(r'.*?#(.*?)\|.*?', subraces[0])
-            for subrace in subraces_str:
-                try:
-                    subrace = SubRace.objects.get(name=subrace)
-                    subraces_obj.append(subrace)
-                except SubRace.DoesNotExist as e:
-                    return f'{name}: Обнаружена новая подраса: {subrace}\n'
-
-        defaults = {
-            'title_eng': title_eng,
-            'name': name,
-            'book': book,
-            'circle': circle,
-            'is_ritual': is_ritual,
-            'cast_time': cast_time,
-            'distance': distance,
-            'components': components,
-            'material_component': material_component,
-            'duration': duration,
-        }
-
-        if not Spell.objects.filter(title_eng=title_eng, name=name, second_side__isnull=False).exists():
-            defaults['description'] = description
-
-        spell, created = Spell.objects.update_or_create(
-            title_eng=title_eng,
-            name=name,
-            defaults=defaults
-        )
-
-        spell.school.add(*schools)
-        spell.classes.add(*classes_obj)
-        spell.subclasses.add(*subclasses_obj)
-        spell.race.add(*races_obj)
-        spell.subrace.add(*subraces_obj)
-
-    return ''
-
-
-def get_description(text):
-    # fonts_config = ((11.25, 17, 33),)
-
-    description_split = re.findall(re.compile(r'Источник.+?\n\n(.*)', re.S), text)[0].replace('\n', '<br>').replace('d', 'к').replace('<br>- ', '<br>• ').split('**')
-    description = ''
-    for i, string in enumerate(description_split):
-        description += string
-        if i % 2 == 0:
-            if i != len(description_split) - 1:
-                description += '<b>'
-        else:
-            description += '</b>'
-
-    return description

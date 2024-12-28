@@ -72,7 +72,7 @@ class Spell(Card):
         return self.name
 
     def get_school(self):
-        return self.school.order_by('priority')[0]
+        return self.school.order_by('priority')[0]  # noqa
 
 
 class Item(Card):
@@ -85,7 +85,7 @@ class Item(Card):
         return self.name
 
     def types(self):
-        return ', '.join([item_type.name for item_type in self.item_types.all()])
+        return ', '.join([item_type.name for item_type in self.item_types.all()])  # noqa
 
 class CastTime(models.Model):
     name = models.CharField(max_length=100)
