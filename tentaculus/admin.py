@@ -73,6 +73,7 @@ class DndClassAdmin(SourceChildAdmin):
 class SubClassAdmin(SourceChildAdmin):
     base_model = SubClass
     show_in_index = True
+    ordering = ('base_class__name', 'name',)
 
 
 @admin.register(Race)

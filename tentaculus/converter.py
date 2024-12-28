@@ -58,6 +58,7 @@ class SpellConverter(FileConverter):
         self.set_title_eng()
         self.set_circle()
         self.set_schools()
+        self.set_subclasses()
 
         self.clear_text()
 
@@ -70,7 +71,6 @@ class SpellConverter(FileConverter):
         self.set_material_components()
         self.set_duration()
         self.set_classes()
-        self.set_subclasses()
         self.set_races()
         self.set_subraces()
 
@@ -259,7 +259,7 @@ class SpellConverter(FileConverter):
     def set_subclasses(self):
         subclasses = re.findall(r'Архетипы: .*\n', self.text)
         if subclasses:
-            subclasses_str = re.findall(r'.*?#(.*?)\|.*?', subclasses[0])
+            subclasses_str = re.findall(r'.*?#.*?\|(.*?) \(', subclasses[0])
             for subclass in subclasses_str:
                 try:
                     subclass = SubClass.objects.get(name=subclass)
