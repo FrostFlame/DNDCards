@@ -36,6 +36,7 @@ class CardChildAdmin(PolymorphicChildModelAdmin):
 class SpellAdmin(CardChildAdmin):
     base_model = Spell
     show_in_index = True
+    list_filter = ('circle',)
     list_display = ['name', 'circle']
     ordering = ('circle', 'name')
     search_fields = ['name']
@@ -74,6 +75,7 @@ class SubClassAdmin(SourceChildAdmin):
     base_model = SubClass
     show_in_index = True
     ordering = ('base_class__name', 'name',)
+    list_filter = ('base_class__name',)
 
 
 @admin.register(Race)
@@ -97,7 +99,8 @@ class SourceParentAdmin(PolymorphicParentModelAdmin):
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('title', 'short')
+    ordering = ('title', 'short')
 
 
 @admin.register(CastTime)

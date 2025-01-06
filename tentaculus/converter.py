@@ -11,11 +11,10 @@ class FileConverter(ABC):
 
         with open(self.path, 'r+', encoding='utf-8') as file:
             text = file.read()
-            self.text = text.replace(u'\xa0', ' ')
-        self.text = text
+            self.text = text.replace(u'\xa0', ' ').replace(' ', ' ')
 
         with open(self.path, 'w', encoding='utf-8') as file:
-            file.write(text)
+            file.write(self.text)
 
     @abstractmethod
     def convert(self):
@@ -59,6 +58,7 @@ class SpellConverter(FileConverter):
         self.set_circle()
         self.set_schools()
         self.set_subclasses()
+        self.set_subraces()
 
         self.clear_text()
 
@@ -72,7 +72,6 @@ class SpellConverter(FileConverter):
         self.set_duration()
         self.set_classes()
         self.set_races()
-        self.set_subraces()
 
         defaults = {
             'title_eng': self.title_eng,
@@ -119,9 +118,9 @@ class SpellConverter(FileConverter):
     def set_circle(self):
         try:
             circle = (re.findall(r'.*?, .*]]', self.text)[0].split(', ')[0])
+            self.circle = 0 if circle == 'Заговор' else int(circle.split(' ')[0])
         except Exception:
             raise ValueError('Не обнаружен круг')
-        self.circle = 0 if circle == 'Заговор' else int(circle.split(' ')[0])
 
     def set_schools(self):
         try:
@@ -142,13 +141,17 @@ class SpellConverter(FileConverter):
         text = ''
         is_inside = False
         for string in text_split:
-            if is_inside and '|' in string:
-                string = re.findall(r'.*?\|(.*)', string)[0]
+            if is_inside:
+                if '|' in string:
+                    string = re.findall(r'.*?\|(.*)', string)[0]
+                string = f'<b>{string}</b>'
 
             text += string
             is_inside = not is_inside
 
         text = ''.join(text)
+
+        text = ''.join(re.split('\(https.*\)', text))
 
         self.text = text
 
@@ -179,7 +182,7 @@ class SpellConverter(FileConverter):
 
     def set_book(self):
         try:
-            book = re.findall(r'Источник.*?: «(.*)»', self.text)[0]
+            book = re.findall(r'Источник.*?:\s«(.*)»', self.text)[0]
         except Exception:
             raise ValueError('Не обнаружена книга')
         try:
@@ -227,7 +230,7 @@ class SpellConverter(FileConverter):
     def set_material_components(self):
         material_components = re.findall(r'Компоненты: .+\((.*)\)', self.text)
         if material_components:
-            self.material_components = material_components[0]
+            self.material_components = material_components[0].replace('<b>', '').replace('</b>', '')
 
     def set_duration(self):
         try:
@@ -246,7 +249,7 @@ class SpellConverter(FileConverter):
             raise ValueError(f'Обнаружена новая длительность: {duration}\n')
 
     def set_classes(self):
-        classes_str = re.findall(r'Классы: (.*)', self.text)
+        classes_str = re.findall(r'Классы: (.*)', self.text.replace('<b>', '').replace('</b>', ''))
         if classes_str:
             classes_str = classes_str[0].split(', ')
             for dnd_class in classes_str:
@@ -257,18 +260,18 @@ class SpellConverter(FileConverter):
                     raise ValueError(f'Обнаружен новый класс: {dnd_class}\n')
 
     def set_subclasses(self):
-        subclasses = re.findall(r'Архетипы: .*\n', self.text)
+        subclasses = re.findall(r'Архетипы: .*\n', self.text.replace('<b>', '').replace('</b>', ''))
         if subclasses:
             subclasses_str = re.findall(r'.*?#.*?\|(.*?) \(', subclasses[0])
             for subclass in subclasses_str:
                 try:
-                    subclass = SubClass.objects.get(name=subclass)
+                    subclass = SubClass.objects.get(name__iexact=subclass)
                     self.subclasses.append(subclass)
                 except SubClass.DoesNotExist as e:
                     raise ValueError(f'Обнаружен новый сабкласс: {subclass}\n')
 
     def set_races(self):
-        races_str = re.findall(r'Расы: (.*)', self.text)
+        races_str = re.findall(r'Расы: (.*)', self.text.replace('<b>', '').replace('</b>', ''))
         if races_str:
             races_str = races_str[0].split(', ')
             for race in races_str:
@@ -280,7 +283,7 @@ class SpellConverter(FileConverter):
                     raise ValueError(f'Обнаружена новая раса: {race}\n')
 
     def set_subraces(self):
-        subraces = re.findall(r'Подрасы: .*\n', self.text)
+        subraces = re.findall(r'Подрасы: .*\n', self.text.replace('<b>', '').replace('</b>', ''))
         if subraces:
             subraces_str = re.findall(r'.*?#(.*?)\|.*?', subraces[0])
             for subrace in subraces_str:

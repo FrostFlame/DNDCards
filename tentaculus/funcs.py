@@ -6,7 +6,7 @@ from tentaculus.forms import SearchForm, ConvertFileForm
 from tentaculus.models import Card, SubClass, DndClass, Spell, Source, Race, SubRace
 
 
-def get_cards_info(request):
+def get_cards_info(request, is_print=False):
     """
     Получение контекста по данным из реквеста
     """
@@ -108,13 +108,17 @@ def get_cards_info(request):
 
     cards = cards.filter(is_face_side=True)
 
-    cards, pdf_orientation = sort_cards(cards)
+    pdf_orientation = None
+    if is_print:
+        cards, pdf_orientation = sort_cards(cards)
 
     for card in cards:
         if card.style == 'Default':
             card.style = style
 
         if is_spell(data):
+            card.get_school = card.school.filter(id__in=schools).order_by('priority')[0]
+
             if source_class:  # noqa
                 card.source = (
                     source_subclass  # noqa
@@ -172,11 +176,11 @@ def get_locked_cards_info(cards_names):
             card.source = style.name
         cards.append(card)
 
-    cards, pdf_orientation = sort_cards(cards)
+    # cards, pdf_orientation = sort_cards(cards)
 
     context = {
         'locked_cards': cards,
-        'pdf_orientation': pdf_orientation,
+        # 'pdf_orientation': pdf_orientation,
     }
     return context
 
@@ -213,6 +217,9 @@ def convert(request):
     """
     obsidian_root = 'D:\Dnd\Obsidian\Кирания'
     search_word = request.POST.get('file_name')
+
+    if not search_word:
+        return 'Не указан файл'
 
     message = ''
     at_least_one = False

@@ -6,28 +6,30 @@
             <h1 title="{{card.title_eng}}" style="font-size: {{card.name_font_size}}px">
                 {{card.circle}}. {{card.name}} {% if card.is_ritual %}(Ритуал) {% endif %}
             </h1>
-            <div class="row">
-                <div contenteditable="true" class="cell">
-                    <b>Накладывание</b>
-                    <span>{{card.cast_time}}</span>
+            {% if card.is_face_side %}
+                <div class="row">
+                    <div contenteditable="true" class="cell">
+                        <b>Накладывание</b>
+                        <span>{{card.cast_time}}</span>
+                    </div>
+                    <div contenteditable="true" class="cell">
+                        <b>Дистанция</b>
+                        <span>{{card.distance}}</span>
+                    </div>
                 </div>
-                <div contenteditable="true" class="cell">
-                    <b>Дистанция</b>
-                    <span>{{card.distance}}</span>
+                <div class="row">
+                    <div contenteditable="true" class="cell">
+                        <b>Компоненты</b>
+                        <span>{{card.components}}</span>
+                    </div>
+                    <div contenteditable="true" class="cell">
+                        <b>Длительность</b>
+                        <span>{{card.duration}}</span>
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <div contenteditable="true" class="cell">
-                    <b>Компоненты</b>
-                    <span>{{card.components}}</span>
-                </div>
-                <div contenteditable="true" class="cell">
-                    <b>Длительность</b>
-                    <span>{{card.duration}}</span>
-                </div>
-            </div>
-            {% if card.material_component %}
-                <div contenteditable="true" class="materials">{{card.material_component}}</div>
+                {% if card.material_component %}
+                    <div contenteditable="true" class="materials">{{card.material_component}}</div>
+                {% endif %}
             {% endif %}
             <div contenteditable="true" class="text" style="font-size: {{card.font_size}}px;">
                 <p>
@@ -39,14 +41,14 @@
                     style="font-size: {{card.footer_font_size}}px"
                 {% endif %}
             >
-                {% if second_side_source %} {{second_side_source }} {% else %} {{card.source}} {% endif %}
+                {% if second_side_source %} {{second_side_source}} {% else %} {{card.source}} {% endif %}
             </b>
             <b class="school"
                 {% if card.footer_font_size %}
                     style="font-size: {{card.footer_font_size}}px"
                 {% endif %}
             >
-                {{card.get_school}} <span title="{{card.book}}">({{card.book.short}})</span>
+                {% if second_side_school %} {{second_side_school}} {% else %} {{card.get_school}} {% endif %} <span title="{{card.book}}">({{card.book.short}})</span>
             </b>
         </div>
     </div>

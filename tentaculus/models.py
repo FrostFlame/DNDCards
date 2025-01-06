@@ -38,13 +38,13 @@ class Rarity(models.TextChoices):
 class Card(PolymorphicModel):
     title_eng = models.CharField(max_length=100)
     name = models.CharField(max_length=100)
+    second_side = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
+    is_face_side = models.BooleanField(default=True)
     name_font_size = models.DecimalField(default=14, max_digits=4, decimal_places=2)
     font_size = models.DecimalField(default=11.25, max_digits=4, decimal_places=2)
     description = models.TextField()
     footer_font_size = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
     book = models.ForeignKey('Book', on_delete=models.CASCADE)
-    second_side = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
-    is_face_side = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
@@ -70,9 +70,6 @@ class Spell(Card):
 
     def __str__(self):
         return self.name
-
-    def get_school(self):
-        return self.school.order_by('priority')[0]  # noqa
 
 
 class Item(Card):

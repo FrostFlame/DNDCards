@@ -69,6 +69,7 @@ def all_items(request):
     context = {
         'cards': items,
         'form': form,
+        'convert_form': ConvertFileForm(),
     }
     return render(request, 'tentaculus/main.html', context)
 
@@ -93,7 +94,7 @@ def print_pdf(request):
     """
     Печать pdf по кнопке
     """
-    context = get_cards_info(request)
+    context = get_cards_info(request, True)
     return async_to_sync(get_pdf)(request, context.get('pdf_orientation'))
 
 
