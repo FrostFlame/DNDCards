@@ -117,7 +117,10 @@ def get_cards_info(request, is_print=False):
             card.style = style
 
         if is_spell(data):
-            card.get_school = card.school.filter(id__in=schools).order_by('priority')[0]
+            if schools:
+                card.get_school = card.school.filter(id__in=schools).order_by('priority')[0]
+            else:
+                card.get_school = card.school.order_by('priority')[0]
 
             if source_class:  # noqa
                 card.source = (
