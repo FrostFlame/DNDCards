@@ -106,7 +106,7 @@ def get_cards_info(request, is_print=False):
     if books:
         cards = cards.filter(book__in=books)
 
-    cards = cards.filter(is_face_side=True)
+    cards = cards.filter(is_face_side=True).distinct()
 
     pdf_orientation = None
     if is_print:
