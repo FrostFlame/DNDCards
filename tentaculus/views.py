@@ -135,9 +135,9 @@ async def get_pdf(request, pdf_orientation):
         f'&subrace={request.GET.get("subrace")}'
         f'&circle_from={request.GET.get("circle_from")}'
         f'&circle_to={request.GET.get("circle_to")}'
-        f'{("&schools=" + request.GET.getlist("schools")) if request.GET.getlist("schools") else ""}'
-        f'{"&books=" + request.GET.getlist("books") if request.GET.getlist("books") else ""}'
-        f'{"&cast_times=" + request.GET.getlist("cast_times") if request.GET.getlist("cast_times") else ""}'
+        f'{("&schools=" + str(request.GET.getlist("schools"))) if request.GET.getlist("schools") else ""}'
+        f'{("&books=" + str(request.GET.getlist("books"))) if request.GET.getlist("books") else ""}'
+        f'{("&cast_times=" + str(request.GET.getlist("cast_times"))) if request.GET.getlist("cast_times") else ""}'
         f'&is_ritual={request.GET.get("is_ritual")}'
         f'&locked_to_print={request.GET.get("locked_to_print")}'
     )
