@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from polymorphic.models import PolymorphicModel
 
@@ -51,6 +52,19 @@ class Card(PolymorphicModel):
 
     def __len__(self):
         return 1 if self.is_face_side and not self.second_side else 2
+
+    def save(self, *args, **kwargs):
+        if self.second_side:
+            if '*' not in self.name:
+                if self.second_side.name == self.name:
+                    try:
+                        second_side = Card.objects.get(name=self.name + '*')
+                        self.second_side = second_side
+                    except Card.DoesNotExist:
+                        self.second_side = None
+            else:
+                self.second_side = None
+        return super(Card, self).save(*args, **kwargs)
 
 
 class Spell(Card):
