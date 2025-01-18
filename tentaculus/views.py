@@ -22,7 +22,7 @@ def all_cards(request):
 
     form = SearchForm(request.GET)
 
-    cards = list(Spell.objects.filter(is_face_side=True)) + list(Item.objects.filter(is_face_side=True))
+    cards = list(Spell.objects.filter(is_face_side=True).order_by('circle', 'name')) + list(Item.objects.filter(is_face_side=True).order_by('name'))
 
     context = {
         'cards': cards,
