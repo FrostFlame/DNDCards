@@ -76,10 +76,10 @@ class Spell(Card):
     components = models.TextField(choices=Component.choices)
     duration = models.ForeignKey('Duration', on_delete=models.CASCADE)
     material_component = models.CharField(max_length=100, null=True, blank=True)
-    classes = models.ManyToManyField('DndClass', null=True, blank=True)
-    subclasses = models.ManyToManyField('Subclass', null=True, blank=True)
-    race = models.ManyToManyField('Race', null=True, blank=True)
-    subrace = models.ManyToManyField('SubRace', null=True, blank=True)
+    classes = models.ManyToManyField('DndClass', blank=True)
+    subclasses = models.ManyToManyField('Subclass', blank=True)
+    race = models.ManyToManyField('Race', blank=True)
+    subrace = models.ManyToManyField('SubRace', blank=True)
     school = models.ManyToManyField('School', related_name='spells')
 
     def __str__(self):

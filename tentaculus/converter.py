@@ -95,10 +95,15 @@ class SpellConverter(FileConverter):
             defaults=defaults
         )
 
+        spell.school.clear()
         spell.school.add(*self.schools)
+        spell.classes.clear()
         spell.classes.add(*self.classes)
+        spell.subclasses.clear()
         spell.subclasses.add(*self.subclasses)
+        spell.race.clear()
         spell.race.add(*self.races)
+        spell.subrace.clear()
         spell.subrace.add(*self.subraces)
 
         return ''
@@ -151,7 +156,8 @@ class SpellConverter(FileConverter):
 
         text = ''.join(text)
 
-        text = ''.join(re.split('\(https.*\)', text))
+        text = ''.join(re.split('\(https.*?\)', text))
+        text = text.replace('[', '<b>').replace(']', '</b>')
 
         self.text = text
 
