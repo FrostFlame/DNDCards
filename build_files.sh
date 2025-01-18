@@ -1,7 +1,7 @@
 echo "BUILD START"
 
 # create a virtual environment named 'venv' if it doesn't already exist
-python -m venv venv
+python3.11 -m venv venv
 
 # activate the virtual environment
 source venv/bin/activate
@@ -10,7 +10,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # make migrations
-python manage.py migrate
-python manage.py collectstatic
+python3.11 manage.py migrate
+python3.11 manage.py collectstatic
 
 echo "BUILD END"
