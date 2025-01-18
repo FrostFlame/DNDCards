@@ -154,30 +154,32 @@
 
 			</form>
 
-			<form id="convert_form" action="/convert_file/" method="post">
-				{% csrf_token %}
-				<div class="mediaWidth">
-					<div id="FileNameInput">
-						<label class="filterLabel">{{ convert_form.file_name.label }}</label>
-						<div style="display: flex;">
-							<div class="customInput">
-								{{ convert_form.file_name }}
+			{% if user.is_superuser %}
+				<form id="convert_form" action="/convert_file/" method="post">
+					{% csrf_token %}
+					<div class="mediaWidth">
+						<div id="FileNameInput">
+							<label class="filterLabel">{{ convert_form.file_name.label }}</label>
+							<div style="display: flex;">
+								<div class="customInput">
+									{{ convert_form.file_name }}
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-				<div class="mediaWidth flexParent">
-					<button type="submit" class="btn-link bt flexChild"><i aria-hidden="true">Конвертировать</i></button>
-				</div>
+					<div class="mediaWidth flexParent">
+						<button type="submit" class="btn-link bt flexChild"><i aria-hidden="true">Конвертировать</i></button>
+					</div>
 
-				<div class="mediaWidth">
-					<div id="MessageBox">
-						<div style="display: flex;">
-							<div id="message" style="width: 14em"></div>
+					<div class="mediaWidth">
+						<div id="MessageBox">
+							<div style="display: flex;">
+								<div id="message" style="width: 14em"></div>
+							</div>
 						</div>
 					</div>
-				</div>
-			</form>
+				</form>
+			{% endif %}
 		</div>
 
 		<div id="locked_container">
