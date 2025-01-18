@@ -22,7 +22,10 @@ def all_cards(request):
 
     form = SearchForm(request.GET)
 
-    cards = list(Spell.objects.filter(is_face_side=True).order_by('circle', 'name')) + list(Item.objects.filter(is_face_side=True).order_by('name'))
+    cards = (
+        list(Spell.objects.filter(is_face_side=True).order_by('circle', 'name'))
+        + list(Item.objects.filter(is_face_side=True).order_by('name'))
+    )
 
     context = {
         'cards': cards,
@@ -49,7 +52,7 @@ def all_spells(request):
 
     form = SearchForm(request.GET, initial={'circle_to': Circle.NINTH})
 
-    spells = Spell.objects.filter(is_face_side=True)
+    spells = Spell.objects.filter(is_face_side=True).order_by('circle', 'name')
     context = {
         'cards': spells,
         'form': form,
@@ -65,7 +68,7 @@ def all_items(request):
 
     form = SearchForm(request.GET)
 
-    items = Item.objects.filter(is_face_side=True)
+    items = Item.objects.filter(is_face_side=True).order_by('name')
     context = {
         'cards': items,
         'form': form,
