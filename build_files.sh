@@ -7,6 +7,7 @@ python3.12 -m venv venv
 source venv/bin/activate
 
 # build_files.sh
+pip install setuptools
 pip install -r requirements.txt
 
 # make migrations
