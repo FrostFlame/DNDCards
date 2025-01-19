@@ -1,6 +1,4 @@
-from django.core.exceptions import ValidationError
 from django.db import models
-from polymorphic.models import PolymorphicModel
 
 
 # Create your models here.
@@ -18,6 +16,7 @@ class Circle(models.IntegerChoices):
     EIGHTS = 8, '8'
     NINTH = 9, '9'
 
+
 class Component(models.TextChoices):
     V = 'В', 'В'
     S = 'С', 'С'
@@ -26,6 +25,7 @@ class Component(models.TextChoices):
     VM = 'В, М', 'В, М'
     SM = 'С, М', 'С, М'
     VSM = 'В, С, М', 'В, С, М'
+
 
 class Rarity(models.TextChoices):
     COMMON = 'Обычный', 'Обычный'
@@ -36,7 +36,10 @@ class Rarity(models.TextChoices):
     ARTIFACT = 'Артифакт', 'Артифакт'
 
 
-class Card(PolymorphicModel):
+class Card(models.Model):
+    class Meta:
+        abstract = True
+
     title_eng = models.CharField(max_length=100)
     name = models.CharField(max_length=100, unique=True)
     second_side = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
@@ -52,19 +55,6 @@ class Card(PolymorphicModel):
 
     def __len__(self):
         return 1 if self.is_face_side and not self.second_side else 2
-
-    def save(self, *args, **kwargs):
-        if self.second_side:
-            if '*' not in self.name:
-                if self.second_side.name == self.name:
-                    try:
-                        second_side = Card.objects.get(name=self.name + '*')
-                        self.second_side = second_side
-                    except Card.DoesNotExist:
-                        self.second_side = None
-            else:
-                self.second_side = None
-        return super(Card, self).save(*args, **kwargs)
 
 
 class Spell(Card):
@@ -85,6 +75,19 @@ class Spell(Card):
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        if self.second_side:
+            if '*' not in self.name:
+                if self.second_side.name == self.name:
+                    try:
+                        second_side = Spell.objects.get(name=self.name + '*')
+                        self.second_side = second_side
+                    except Spell.DoesNotExist:
+                        self.second_side = None
+            else:
+                self.second_side = None
+        return super(Spell, self).save(*args, **kwargs)
+
 
 class Item(Card):
     style = 'Item'
@@ -98,11 +101,13 @@ class Item(Card):
     def types(self):
         return ', '.join([item_type.name for item_type in self.item_types.all()])  # noqa
 
+
 class CastTime(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
+
 
 class Distance(models.Model):
     name = models.CharField(max_length=30, unique=True)
@@ -110,11 +115,13 @@ class Distance(models.Model):
     def __str__(self):
         return self.name
 
+
 class Duration(models.Model):
     name = models.CharField(max_length=40, unique=True)
 
     def __str__(self):
         return self.name
+
 
 class Book(models.Model):
     title = models.CharField(max_length=100, unique=True)
@@ -124,17 +131,21 @@ class Book(models.Model):
     def __str__(self):
         return self.title
 
-class Source(PolymorphicModel):
+
+class Source(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
         return self.name
 
     class Meta:
+        abstract = True
         ordering = ('name',)
+
 
 class DndClass(Source):
     style = models.CharField(max_length=20, unique=True, null=True, blank=True)
+
 
 class SubClass(Source):
     base_class = models.ForeignKey(DndClass, related_name='subclasses', on_delete=models.CASCADE, blank=True, null=True)
@@ -146,11 +157,14 @@ class SubClass(Source):
     def __str__(self):
         return f'{self.name} ({self.base_class.name})'
 
+
 class Race(Source):
     style = models.CharField(max_length=20, unique=True, null=True, blank=True)
 
+
 class SubRace(Source):
     base_race = models.ForeignKey(Race, related_name='subraces', on_delete=models.CASCADE, blank=True, null=True)
+
 
 class School(models.Model):
     name = models.CharField(max_length=20, unique=True)
@@ -159,11 +173,13 @@ class School(models.Model):
     def __str__(self):
         return self.name
 
+
 class Attunement(models.Model):
     name = models.CharField(max_length=20, unique=True)
 
     def __str__(self):
         return self.name
+
 
 class ItemType(models.Model):
     name = models.CharField(max_length=20, unique=True)

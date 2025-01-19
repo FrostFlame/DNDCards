@@ -3,7 +3,7 @@ from pathlib import Path
 
 from tentaculus.converter import SpellConverter
 from tentaculus.forms import SearchForm, ConvertFileForm
-from tentaculus.models import Card, SubClass, DndClass, Spell, Source, Race, SubRace
+from tentaculus.models import Card, SubClass, DndClass, Spell, Source, Race, SubRace, Item
 
 
 def get_cards_info(request, is_print=False):
@@ -36,7 +36,7 @@ def get_cards_info(request, is_print=False):
 
     if is_spell(data):
         ### Блок обработки заклинаний
-        cards = Spell.objects.all().order_by('circle', 'name')
+        cards = Spell.objects.filter(is_face_side=True).order_by('circle', 'name').distinct()
 
         source_class = None
         source_subclass = None
@@ -91,22 +91,33 @@ def get_cards_info(request, is_print=False):
         if is_ritual:
             cards = cards.filter(is_ritual=True)
 
+        if books:
+            cards = cards.filter(book__in=books)
+
+        if name:
+            name = name.strip().split(',')
+            filters = Q()
+            for separate_name in name:
+                if separate_name:
+                    filters = filters | Q(name__icontains=separate_name.strip())
+            cards = cards.filter(filters)
+
     else:
         ### Блок обработки всего вместе
-        cards = Card.objects.all()
-
-    if name:
-        name = name.strip().split(',')
         filters = Q()
-        for separate_name in name:
-            if separate_name:
-                filters = filters | Q(name__icontains=separate_name.strip())
-        cards = cards.filter(filters)
+        if name:
+            name = name.strip().split(',')
+            for separate_name in name:
+                if separate_name:
+                    filters = filters | Q(name__icontains=separate_name.strip())
 
-    if books:
-        cards = cards.filter(book__in=books)
+        if books:
+            filters = filters | Q(book__in=books)
 
-    cards = cards.filter(is_face_side=True).distinct()
+        cards = (
+            list(Spell.objects.filter(is_face_side=True).filter(filters).distinct())
+            + list(Item.objects.filter(is_face_side=True).filter(filters).distinct())
+        )
 
     pdf_orientation = None
     if is_print:
@@ -171,7 +182,10 @@ def get_locked_cards_info(cards_names):
         card_name, style = card_name.split('|')
         if card_name[0].isdigit():
             card_name = ''.join(card_name.split('. ')[1:])
-        card = Card.objects.get(name__iexact=card_name)
+        card = (
+            Spell.objects.filter(name__iexact=card_name).first()
+            or Item.objects.filter(name__iexact=card_name).first()
+        )
 
         if card.style == 'Default' and style:
             style = Source.objects.get(name=style)

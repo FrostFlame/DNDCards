@@ -191,6 +191,22 @@
 	</div>
 	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 	<script>
+		$("#id_dnd_class").change(function () {
+			var classId = $(this).val();
+			$("#id_subclass").val("");
+
+			$.ajax({
+				url: '/ajax-subclasses',
+				data: {
+					'class': classId
+				},
+				success: function (data) {
+					$("#id_subclass").html(data);
+				}
+			});
+
+		});
+
 		<!--		function ajax_search() {-->
 		let ids = "#id_name, #id_dnd_class, #id_subclass, #id_race, #id_subrace, #id_circle_from, #id_circle_to"
 
@@ -254,22 +270,6 @@
 		});
 <!--		}-->
 <!--		ajax_search();-->
-
-		$("#id_dnd_class").change(function () {
-			var classId = $(this).val();
-			$("#id_subclass").val("");
-
-			$.ajax({
-				url: '/ajax-subclasses',
-				data: {
-					'class': classId
-				},
-				success: function (data) {
-					$("#id_subclass").html(data);
-				}
-			});
-
-		});
 
 		$("#id_race").change(function () {
 			var raceId = $(this).val();

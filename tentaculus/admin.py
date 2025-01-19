@@ -1,14 +1,8 @@
 from django.contrib import admin
-from polymorphic.admin import (
-    PolymorphicParentModelAdmin,
-    PolymorphicChildModelAdmin,
-    PolymorphicChildModelFilter,
-)
 
 from tentaculus.models import (
     Attunement,
     Book,
-    Card,
     CastTime,
     Distance,
     DndClass,
@@ -17,7 +11,6 @@ from tentaculus.models import (
     ItemType,
     Race,
     School,
-    Source,
     Spell,
     SubClass,
     SubRace,
@@ -25,15 +18,8 @@ from tentaculus.models import (
 
 
 # Register your models here.
-
-class CardChildAdmin(PolymorphicChildModelAdmin):
-    base_model = Card
-    save_as = True
-    save_on_top = True
-
-
 @admin.register(Spell)
-class SpellAdmin(CardChildAdmin):
+class SpellAdmin(admin.ModelAdmin):
     base_model = Spell
     show_in_index = True
     list_filter = ('circle',)
@@ -44,34 +30,21 @@ class SpellAdmin(CardChildAdmin):
 
 
 @admin.register(Item)
-class ItemAdmin(CardChildAdmin):
+class ItemAdmin(admin.ModelAdmin):
     base_model = Item
     show_in_index = True
     search_fields = ['name']
     autocomplete_fields = ['second_side']
 
 
-@admin.register(Card)
-class CardParentAdmin(PolymorphicParentModelAdmin):
-    base_model = Card
-    child_models = (Spell, Item)
-    list_filter = (PolymorphicChildModelFilter,)
-    search_fields = ['name']
-    autocomplete_fields = ['second_side']
-
-
-class SourceChildAdmin(PolymorphicChildModelAdmin):
-    base_model = Source
-
-
 @admin.register(DndClass)
-class DndClassAdmin(SourceChildAdmin):
+class DndClassAdmin(admin.ModelAdmin):
     base_model = DndClass
     show_in_index = True
 
 
 @admin.register(SubClass)
-class SubClassAdmin(SourceChildAdmin):
+class SubClassAdmin(admin.ModelAdmin):
     base_model = SubClass
     show_in_index = True
     ordering = ('base_class__name', 'name',)
@@ -79,22 +52,15 @@ class SubClassAdmin(SourceChildAdmin):
 
 
 @admin.register(Race)
-class RaceAdmin(SourceChildAdmin):
+class RaceAdmin(admin.ModelAdmin):
     base_model = Race
     show_in_index = True
 
 
 @admin.register(SubRace)
-class SubRaceAdmin(SourceChildAdmin):
+class SubRaceAdmin(admin.ModelAdmin):
     base_model = SubRace
     show_in_index = True
-
-
-@admin.register(Source)
-class SourceParentAdmin(PolymorphicParentModelAdmin):
-    base_model = Source
-    child_models = (DndClass, SubClass, Race, SubRace)
-    list_filter = (PolymorphicChildModelFilter,)
 
 
 @admin.register(Book)
