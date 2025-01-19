@@ -218,7 +218,7 @@ def convert(request):
     """
     Конвертирование загруженного файла в сущность БД
     """
-    obsidian_root = 'D:\Dnd\Obsidian\Кирания'
+    obsidian_root = 'D:\Dnd\Obsidian\Kirania'
     search_word = request.POST.get('file_name')
 
     if not search_word:
