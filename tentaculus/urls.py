@@ -14,4 +14,6 @@ urlpatterns = [
     path('ajax-search', views.search, name='ajax_search'),
     path('ajax-locked-block', views.update_locked_block, name='ajax_locked_block'),
     path('ajax-convert-file', views.convert_file, name='convert_file'),
+
+    path('test', views.test, name='test'),
 ]

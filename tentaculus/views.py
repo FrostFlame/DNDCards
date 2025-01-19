@@ -7,7 +7,7 @@ from django.shortcuts import render
 
 from tentaculus.forms import SearchForm, ConvertFileForm
 from tentaculus.funcs import get_cards_info, convert
-from tentaculus.models import Item, Spell, Card, DndClass, SubClass, Circle, Race, SubRace
+from tentaculus.models import Item, Spell, Card, DndClass, SubClass, Circle, Race, SubRace, Book
 
 from pyppeteer import launch
 
@@ -22,7 +22,7 @@ def all_cards(request):
 
     form = SearchForm(request.GET)
 
-    spells = Spell.objects.filter(is_face_side=True).order_by('circle', 'name')
+    spells = Spell.objects.filter(is_face_side=True).prefetch_related('school').order_by('circle', 'name')
     for spell in spells:
         spell.get_school = spell.school.order_by('priority')[0]
 
@@ -53,7 +53,7 @@ def all_spells(request):
 
     form = SearchForm(request.GET, initial={'circle_to': Circle.NINTH})
 
-    spells = Spell.objects.filter(is_face_side=True).order_by('circle', 'name')
+    spells = Spell.objects.filter(is_face_side=True).prefetch_related('school').order_by('circle', 'name')
     for spell in spells:
         spell.get_school = spell.school.order_by('priority')[0]
     context = {
@@ -182,3 +182,8 @@ def convert_file(request):
         message = ''
 
     return JsonResponse({'success': True, 'message': message})
+
+
+def test(request):
+    books = Book.objects.all()
+    return JsonResponse({'books': str(list(books))})

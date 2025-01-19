@@ -1,0 +1,5 @@
+DB_NAME= postgres
+DB_USER= postgres.yxqpquztjnywkhhmmxtp
+DB_PASSWORD= blindhero6
+DB_HOST= aws-0-eu-north-1.pooler.supabase.com
+DB_PORT= 5432

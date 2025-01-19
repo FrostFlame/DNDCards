@@ -38,7 +38,7 @@ class Rarity(models.TextChoices):
 
 class Card(PolymorphicModel):
     title_eng = models.CharField(max_length=100)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     second_side = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
     is_face_side = models.BooleanField(default=True)
     name_font_size = models.DecimalField(default=14, max_digits=4, decimal_places=2)
@@ -99,33 +99,33 @@ class Item(Card):
         return ', '.join([item_type.name for item_type in self.item_types.all()])  # noqa
 
 class CastTime(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
 
 class Distance(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=30, unique=True)
 
     def __str__(self):
         return self.name
 
 class Duration(models.Model):
-    name = models.CharField(max_length=40)
+    name = models.CharField(max_length=40, unique=True)
 
     def __str__(self):
         return self.name
 
 class Book(models.Model):
-    title = models.CharField(max_length=100)
-    title_eng = models.CharField(max_length=100)
-    short = models.CharField(max_length=10)
+    title = models.CharField(max_length=100, unique=True)
+    title_eng = models.CharField(max_length=100, unique=True)
+    short = models.CharField(max_length=10, unique=True)
 
     def __str__(self):
         return self.title
 
 class Source(PolymorphicModel):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
         return self.name
@@ -134,7 +134,7 @@ class Source(PolymorphicModel):
         ordering = ('name',)
 
 class DndClass(Source):
-    style = models.CharField(max_length=20, null=True, blank=True)
+    style = models.CharField(max_length=20, unique=True, null=True, blank=True)
 
 class SubClass(Source):
     base_class = models.ForeignKey(DndClass, related_name='subclasses', on_delete=models.CASCADE, blank=True, null=True)
@@ -147,26 +147,26 @@ class SubClass(Source):
         return f'{self.name} ({self.base_class.name})'
 
 class Race(Source):
-    style = models.CharField(max_length=20, null=True, blank=True)
+    style = models.CharField(max_length=20, unique=True, null=True, blank=True)
 
 class SubRace(Source):
     base_race = models.ForeignKey(Race, related_name='subraces', on_delete=models.CASCADE, blank=True, null=True)
 
 class School(models.Model):
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=20, unique=True)
     priority = models.IntegerField()
 
     def __str__(self):
         return self.name
 
 class Attunement(models.Model):
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=20, unique=True)
 
     def __str__(self):
         return self.name
 
 class ItemType(models.Model):
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=20, unique=True)
 
     def __str__(self):
         return self.name
