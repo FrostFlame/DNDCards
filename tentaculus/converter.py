@@ -232,6 +232,7 @@ class SpellConverter(FileConverter):
         for comp in Component:
             if all([letter in comp for letter in components]):
                 self.components = comp
+                return
 
     def set_material_components(self):
         material_components = re.findall(r'Компоненты: .+\((.*)\)', self.text)

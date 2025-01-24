@@ -53,7 +53,7 @@ def get_cards_info(request, is_print=False):
                 filters = filters | Q(subclasses=subclass)
 
                 form.fields['subclass'].initial = subclass
-            cards = cards.filter(filters).distinct()
+            cards = cards.filter(filters)
 
             style = class_instance.style
 
@@ -72,7 +72,7 @@ def get_cards_info(request, is_print=False):
                 filters = filters | Q(subclasses=subrace)
 
                 form.fields['subrace'].initial = subrace
-            cards = cards.filter(filters).distinct()
+            cards = cards.filter(filters)
 
             style = race_instance.style
 
@@ -115,7 +115,7 @@ def get_cards_info(request, is_print=False):
             filters = filters | Q(book__in=books)
 
         cards = (
-            list(Spell.objects.filter(is_face_side=True).filter(filters).distinct())
+            list(Spell.objects.filter(is_face_side=True).filter(filters).order_by('circle', 'name').distinct())
             + list(Item.objects.filter(is_face_side=True).filter(filters).distinct())
         )
 

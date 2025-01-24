@@ -23,10 +23,15 @@ class SpellAdmin(admin.ModelAdmin):
     base_model = Spell
     show_in_index = True
     list_filter = ('circle',)
-    list_display = ['name', 'circle']
+    list_display = ['name', 'circle', 'schools']
     ordering = ('circle', 'name')
     search_fields = ['name']
     autocomplete_fields = ['second_side']
+    save_as = True
+    save_on_top = True
+
+    def schools(self, obj):
+        return ' '.join(obj.school.values_list('name', flat=True))
 
 
 @admin.register(Item)
