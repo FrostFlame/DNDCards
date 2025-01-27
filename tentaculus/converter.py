@@ -11,6 +11,8 @@ class FileConverter(ABC):
 
         with open(self.path, 'r+', encoding='utf-8') as file:
             text = file.read()
+            text = ''.join(re.split('lastSync.*\n', text))
+            text = text.replace('---\n---\n', '').replace('---\n\n---\n', '')
             self.text = text.replace(u'\xa0', ' ').replace(' ', ' ')
 
         with open(self.path, 'w', encoding='utf-8') as file:
