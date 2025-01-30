@@ -36,7 +36,7 @@ def get_cards_info(request, is_print=False):
 
     if is_spell(data):
         ### Блок обработки заклинаний
-        cards = Spell.objects.filter(is_face_side=True).order_by('circle', 'name').distinct()
+        cards = Spell.objects.filter(is_face_side=True).select_related('second_side').order_by('circle', 'name').distinct()
 
         source_class = None
         source_subclass = None
@@ -115,15 +115,22 @@ def get_cards_info(request, is_print=False):
             filters = filters | Q(book__in=books)
 
         cards = (
-            list(Spell.objects.filter(is_face_side=True).filter(filters).order_by('circle', 'name').distinct())
-            + list(Item.objects.filter(is_face_side=True).filter(filters).distinct())
+            list(Spell.objects.filter(is_face_side=True).filter(filters).select_related('second_side').order_by('circle', 'name').distinct())
+            + list(Item.objects.filter(is_face_side=True).filter(filters).select_related('second_side').distinct())
         )
 
     pdf_orientation = None
     if is_print:
         cards, pdf_orientation = sort_cards(cards)
 
+    cards_full = []
     for card in cards:
+        cards_full.append(card)
+
+        if card.second_side:
+            cards_full.append(card.second_side)
+
+    for card in cards_full:
         if card.style == 'Default':
             card.style = style
 
@@ -147,7 +154,7 @@ def get_cards_info(request, is_print=False):
                 )
 
     context = {
-        'cards': cards,
+        'cards': cards_full,
         'form': form,
         'convert_form': ConvertFileForm(),
         'pdf_orientation': pdf_orientation,
