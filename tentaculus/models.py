@@ -42,7 +42,7 @@ class Card(models.Model):
 
     title_eng = models.CharField(max_length=100)
     name = models.CharField(max_length=100, unique=True)
-    second_side = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
+    second_side_spell = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
     is_face_side = models.BooleanField(default=True)
     name_font_size = models.DecimalField(default=14, max_digits=4, decimal_places=2)
     font_size = models.DecimalField(default=11.25, max_digits=4, decimal_places=2)
@@ -55,6 +55,11 @@ class Card(models.Model):
 
     def __len__(self):
         return 1 if self.is_face_side and not self.second_side else 2
+
+    @property
+    def second_side(self):
+        if self.second_side_spell:
+            return self.second_side_spell
 
 
 class Spell(Card):
@@ -76,16 +81,16 @@ class Spell(Card):
         return self.name
 
     def save(self, *args, **kwargs):
-        if self.second_side:
+        if self.second_side_spell:
             if '*' not in self.name:
-                if self.second_side.name == self.name:
+                if self.second_side_spell.name == self.name:
                     try:
-                        second_side = Spell.objects.get(name=self.name + '*')
-                        self.second_side = second_side
+                        second_side_spell = Spell.objects.get(name=self.name + '*')
+                        self.second_side_spell = second_side_spell
                     except Spell.DoesNotExist:
-                        self.second_side = None
+                        self.second_side_spell = None
             else:
-                self.second_side = None
+                self.second_side_spell = None
         return super(Spell, self).save(*args, **kwargs)
 
 

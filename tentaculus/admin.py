@@ -26,7 +26,7 @@ class SpellAdmin(admin.ModelAdmin):
     list_display = ['name', 'circle', 'schools']
     ordering = ('circle', 'name')
     search_fields = ['name']
-    autocomplete_fields = ['second_side']
+    autocomplete_fields = ['second_side_spell']
     save_as = True
     save_on_top = True
 
@@ -39,7 +39,7 @@ class ItemAdmin(admin.ModelAdmin):
     base_model = Item
     show_in_index = True
     search_fields = ['name']
-    autocomplete_fields = ['second_side']
+    autocomplete_fields = ['second_side_spell']
 
 
 @admin.register(DndClass)

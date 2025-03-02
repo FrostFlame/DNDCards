@@ -1,6 +1,5 @@
 import os
 
-from asgiref.sync import async_to_sync
 from django.http import HttpResponse
 from django.http.response import JsonResponse
 from django.shortcuts import render
@@ -9,7 +8,7 @@ from tentaculus.forms import SearchForm, ConvertFileForm
 from tentaculus.funcs import get_cards_info, convert
 from tentaculus.models import Item, Spell, Card, DndClass, SubClass, Circle, Race, SubRace, Book
 
-from pyppeteer import launch
+from playwright.sync_api import sync_playwright
 
 
 # Create your views here.
@@ -53,7 +52,7 @@ def all_spells(request):
 
     form = SearchForm(request.GET, initial={'circle_to': Circle.NINTH})
 
-    spells = Spell.objects.filter(is_face_side=True).select_related('second_side').prefetch_related('school').order_by('circle', 'name')
+    spells = Spell.objects.filter(is_face_side=True).select_related('second_side_spell').prefetch_related('school').order_by('circle', 'name')
     for spell in spells:
         spell.get_school = spell.school.order_by('priority')[0]
     context = {
@@ -101,7 +100,7 @@ def print_pdf(request):
     Печать pdf по кнопке
     """
     context = get_cards_info(request, True)
-    return async_to_sync(get_pdf)(request, context.get('pdf_orientation'))
+    return get_pdf(request, context.get('pdf_orientation'))
 
 
 def load_subclasses(request):
@@ -128,7 +127,7 @@ def load_subraces(request):
     return render(request, 'tentaculus/suboptions.html', {'suboptions': subraces})
 
 
-async def get_pdf(request, pdf_orientation):
+def get_pdf(request, pdf_orientation):
     """
     Генерация pdf
     """
@@ -149,12 +148,14 @@ async def get_pdf(request, pdf_orientation):
     )
     pdf_path = 'example.pdf'
 
-    browser = await launch(headless=True, options={'handleSIGINT': False, 'handleSIGTERM': False})
-    page = await browser.newPage()
-    await page.goto(url)
-    await page.emulateMedia('screen')
-    await page.pdf({'path': pdf_path, 'format': 'Letter' if pdf_orientation else 'A4', 'printBackground': True,
-                    'landscape': pdf_orientation})
+    with sync_playwright() as p:
+        browser = p.chromium
+        browser = browser.launch()
+        page = browser.new_page()
+        page.goto(url)
+        page.emulate_media(media='screen')
+        page.pdf(path=pdf_path, format='Letter' if pdf_orientation else 'A4', print_background=True,
+                 landscape=pdf_orientation)
 
     try:
         with open(pdf_path, 'rb') as content:
