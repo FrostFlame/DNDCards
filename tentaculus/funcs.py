@@ -1,7 +1,7 @@
 from django.db.models import Q
 from pathlib import Path
 
-from tentaculus.converter import SpellConverter
+from tentaculus.converter import SpellConverter, ItemConverter
 from tentaculus.forms import SearchForm, ConvertFileForm
 from tentaculus.models import Card, SubClass, DndClass, Spell, Source, Race, SubRace, Item
 
@@ -253,6 +253,11 @@ def convert(request):
             if '\\заклинания\\' in str(path).lower():
                 try:
                      message += SpellConverter(path).convert()
+                except Exception as e:
+                    message += f'{str(path)}: {e.args[0]}'
+            elif '\\волшебные предметы\\' in str(path).lower():
+                try:
+                     message += ItemConverter(path).convert()
                 except Exception as e:
                     message += f'{str(path)}: {e.args[0]}'
 

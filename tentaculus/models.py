@@ -42,7 +42,8 @@ class Card(models.Model):
 
     title_eng = models.CharField(max_length=100)
     name = models.CharField(max_length=100, unique=True)
-    second_side_spell = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
+    second_side_spell = models.ForeignKey('Spell', on_delete=models.CASCADE, blank=True, null=True)
+    second_side_item = models.ForeignKey('Item', on_delete=models.CASCADE, blank=True, null=True)
     is_face_side = models.BooleanField(default=True)
     name_font_size = models.DecimalField(default=14, max_digits=4, decimal_places=2)
     font_size = models.DecimalField(default=11.25, max_digits=4, decimal_places=2)
@@ -60,6 +61,8 @@ class Card(models.Model):
     def second_side(self):
         if self.second_side_spell:
             return self.second_side_spell
+        elif self.second_side_item:
+            return self.second_side_item
 
 
 class Spell(Card):
@@ -97,14 +100,11 @@ class Spell(Card):
 class Item(Card):
     style = 'Item'
     attunement = models.ForeignKey('Attunement', on_delete=models.CASCADE)
-    item_types = models.ManyToManyField('ItemType', related_name='items')
+    item_type = models.ForeignKey('ItemType', related_name='items', null=True, on_delete=models.SET_NULL)
     rarity = models.TextField(choices=Rarity.choices)
 
     def __str__(self):
         return self.name
-
-    def types(self):
-        return ', '.join([item_type.name for item_type in self.item_types.all()])  # noqa
 
 
 class CastTime(models.Model):

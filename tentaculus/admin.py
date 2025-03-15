@@ -40,6 +40,8 @@ class ItemAdmin(admin.ModelAdmin):
     show_in_index = True
     search_fields = ['name']
     autocomplete_fields = ['second_side_spell']
+    save_as = True
+    save_on_top = True
 
 
 @admin.register(DndClass)

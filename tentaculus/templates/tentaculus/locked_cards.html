@@ -20,14 +20,17 @@
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 	<script>
 		$(".bUnlockItem").click(function () {
-			var locked_to_print = $("#locked_to_print").prop("value");
-
 			var card_name = $(this).siblings("h1")[0].innerText;
 			var str_to_delete = ", " + card_name + "|" + $(this).siblings('.class').text().trim();
-			str_to_delete = str_to_delete.replace(".", "\.").replace("|", "\\|");
 
-			var locked_to_print = locked_to_print.split(new RegExp(str_to_delete + '(.*)'));
-			locked_to_print = locked_to_print[0] ? locked_to_print[0] : '' + locked_to_print[1] ? locked_to_print[1] : ''
+			var locked_to_print = $("#locked_to_print").prop("value");
+
+			var locked_split = locked_to_print.split(str_to_delete);
+			locked_to_print = (locked_split[0] ? locked_split[0] : '') + (locked_split[1] ? locked_split[1] : '');
+			for (let i = 2; i < locked_split.length; i++) {
+		  		locked_to_print += str_to_delete;
+		  		locked_to_print += locked_split[i]
+			}
 
 			$("#locked_to_print").prop("value", locked_to_print);
 			if (locked_to_print == '') {

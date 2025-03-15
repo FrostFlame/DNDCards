@@ -6,16 +6,18 @@
             <h1 title="{{card.title_eng}}" style="font-size: {{card.name_font_size}}px">
                 {{card.name}}
             </h1>
-            <div class="row">
-                <div contenteditable="true" class="cell">
-                    <b>Настройка</b>
-                    <span>{{card.attunement}}</span>
+            {% if card.is_face_side %}
+                <div class="row">
+                    <div contenteditable="true" class="cell">
+                        <b>Настройка</b>
+                        <span>{{card.attunement}}</span>
+                    </div>
+                    <div contenteditable="true" class="cell">
+                        <b>Тип</b>
+                        <span>{{card.item_type}}</span>
+                    </div>
                 </div>
-                <div contenteditable="true" class="cell">
-                    <b>Тип</b>
-                    <span>{{card.types}}</span>
-                </div>
-            </div>
+            {% endif %}
             <div contenteditable="true" class="text" style="font-size: {{card.font_size}}px;">
                 <p>
                     {{card.description|safe}}
