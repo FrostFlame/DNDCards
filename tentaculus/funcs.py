@@ -205,11 +205,8 @@ def get_locked_cards_info(cards_names):
             card.source = style.name
         cards.append(card)
 
-    # cards, pdf_orientation = sort_cards(cards)
-
     context = {
         'locked_cards': cards,
-        # 'pdf_orientation': pdf_orientation,
     }
     return context
 
