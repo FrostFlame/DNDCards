@@ -102,6 +102,7 @@ class Item(Card):
     attunement = models.ForeignKey('Attunement', on_delete=models.CASCADE)
     item_type = models.ForeignKey('ItemType', related_name='items', null=True, on_delete=models.SET_NULL)
     rarity = models.TextField(choices=Rarity.choices)
+    requirements = models.ForeignKey('ItemRequirements', null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.name
@@ -188,6 +189,13 @@ class Attunement(models.Model):
 
 class ItemType(models.Model):
     name = models.CharField(max_length=20, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
+class ItemRequirements(models.Model):
+    name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name

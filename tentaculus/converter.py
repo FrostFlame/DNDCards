@@ -2,7 +2,7 @@ import re
 from abc import ABC, abstractmethod
 
 from tentaculus.models import Spell, Book, Component, DndClass, SubClass, Race, SubRace, School, CastTime, Distance, \
-    Duration, Item, Attunement, ItemType, Rarity
+    Duration, Item, Attunement, ItemType, Rarity, ItemRequirements
 
 
 class FileConverter(ABC):
@@ -314,6 +314,7 @@ class ItemConverter(FileConverter):
         self.attunement = None
         self.item_type = None
         self.rarity = None
+        self.requirements = None
 
     def convert(self):
         """
@@ -328,6 +329,7 @@ class ItemConverter(FileConverter):
         self.set_book()
         self.set_item_type()
         self.set_rarity()
+        self.set_requirements()
 
         defaults = {
             'title_eng': self.title_eng,
@@ -336,6 +338,7 @@ class ItemConverter(FileConverter):
             'book': self.book,
             'item_type': self.item_type,
             'rarity': self.rarity,
+            'requirements': self.requirements,
         }
 
         if not Item.objects.filter(title_eng=self.title_eng, name=self.name, second_side_spell__isnull=False).exists():  # noqa
@@ -389,4 +392,18 @@ class ItemConverter(FileConverter):
                 return
 
         raise ValueError(f'Обнаружена некорректная редкость\n')
+
+    def set_requirements(self):
+        try:
+            requirements = re.findall(r'Требования\*\*: (.*)', self.text)
+            if not requirements:
+               return
+            requirements = requirements[0].replace('<b>', '').replace('</b>', '')
+        except:
+            raise ValueError('Не обнаружены требования')
+
+        try:
+            self.requirements = ItemRequirements.objects.get(name=requirements)  # noqa
+        except ItemRequirements.DoesNotExist as e:  # noqa
+            raise ValueError(f'Обнаружены новые требования: {requirements}\n')
 

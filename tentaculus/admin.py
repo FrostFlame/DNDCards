@@ -14,6 +14,7 @@ from tentaculus.models import (
     Spell,
     SubClass,
     SubRace,
+    ItemRequirements,
 )
 
 
@@ -102,4 +103,8 @@ class AttunementAdmin(admin.ModelAdmin):
 
 @admin.register(ItemType)
 class ItemTypeAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(ItemRequirements)
+class ItemRequirementsAdmin(admin.ModelAdmin):
     pass

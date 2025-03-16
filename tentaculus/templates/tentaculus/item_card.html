@@ -17,6 +17,11 @@
                         <span>{{card.item_type}}</span>
                     </div>
                 </div>
+                {% if card.requirements %}
+                    <div style="font-size: 10px; margin: 0; padding: 0; padding-left: .9em; padding-right: .9em; text-align: center; border-bottom: 2px solid grey;">
+                        Требования: {{card.requirements}}
+                    </div>
+                {% endif %}
             {% endif %}
             <div contenteditable="true" class="text" style="font-size: {{card.font_size}}px;">
                 <p>

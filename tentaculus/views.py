@@ -23,11 +23,11 @@ def all_cards(request):
 
     form = SearchForm(request.GET)
 
-    spells = Spell.objects.prefetch_related('school').order_by('circle', 'name')
+    spells = Spell.objects.prefetch_related('school').order_by('circle', 'name')[:50]
     for spell in spells:
         spell.get_school = spell.school.order_by('priority')[0]
 
-    cards = list(spells) + list(Item.objects.order_by('name'))
+    cards = list(spells) + list(Item.objects.order_by('name')[:50])
 
     context = {
         'cards': cards,
