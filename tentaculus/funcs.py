@@ -195,7 +195,12 @@ def get_locked_cards_info(cards_names):
         )
 
         if card.style == 'Default' and style:
-            style = Source.objects.get(name=style)
+            for source in (DndClass, SubClass, Race, SubRace):
+                try:
+                    style = source.objects.get(name=style)
+                    break
+                except source.DoesNotExist:
+                    pass
             card.style = style.style
             card.source = style.name
         cards.append(card)
