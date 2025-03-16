@@ -54,7 +54,7 @@ def all_spells(request):
 
     form = SearchForm(request.GET, initial={'circle_to': Circle.NINTH})
 
-    spells = Spell.objects.filter().select_related('second_side_spell').prefetch_related('school').order_by('circle', 'name')
+    spells = Spell.objects.filter().select_related('second_side_spell').prefetch_related('school').order_by('circle', 'name')[:100]
     for spell in spells:
         spell.get_school = spell.school.order_by('priority')[0]
     context = {
@@ -72,7 +72,7 @@ def all_items(request):
 
     form = SearchForm(request.GET)
 
-    items = Item.objects.filter().order_by('name')
+    items = Item.objects.filter().order_by('name')[:100]
     context = {
         'cards': items,
         'form': form,
