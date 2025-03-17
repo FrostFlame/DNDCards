@@ -156,7 +156,7 @@ class SpellConverter(FileConverter):
             'duration': self.duration,
         }
 
-        if not Spell.objects.filter(title_eng=self.title_eng, name=self.name, second_side_spell__isnull=False).exists():  # noqa
+        if not Spell.objects.filter(is_ability=False, title_eng=self.title_eng, name=self.name, second_side_spell__isnull=False).exists():  # noqa
             defaults['description'] = self.description
 
         spell, created = Spell.objects.update_or_create(  # noqa

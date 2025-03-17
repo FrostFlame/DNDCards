@@ -36,7 +36,7 @@ def get_cards_info(request, is_print=False):
 
     if is_spell(data):
         ### Блок обработки заклинаний
-        cards = Spell.objects.filter(is_face_side=True).select_related('second_side_spell').order_by('circle', 'name').distinct()
+        cards = Spell.objects.filter(is_ability=False, is_face_side=True).select_related('second_side_spell').order_by('circle', 'name').distinct()
 
         source_class = None
         source_subclass = None
@@ -115,8 +115,9 @@ def get_cards_info(request, is_print=False):
             filters = filters | Q(book__in=books)
 
         cards = (
-            list(Spell.objects.filter(is_face_side=True).filter(filters).select_related('second_side_spell').order_by('circle', 'name').distinct())
+            list(Spell.objects.filter(is_face_side=True, is_ability=False).filter(filters).select_related('second_side_spell').order_by('circle', 'name').distinct())
             + list(Item.objects.filter(is_face_side=True).filter(filters).select_related('second_side_spell').distinct())
+            + list(Spell.objects.filter(is_face_side=True, is_ability=True).filter(filters).order_by('name').distinct())
         )
 
     pdf_orientation = None

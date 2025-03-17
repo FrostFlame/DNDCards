@@ -1,12 +1,12 @@
 <div class="cardContainer cardView {% if second_side_style %} {{second_side_style}} {% else %} {{card.style}} {% endif %}" style="width: 225px;">
     <div class="spellCard">
-        <div class="spellCard-content">
+        <div class="spellCard-content" {% if card.is_ability %} style="outline: black solid 1px;" {% endif %}>
             <span title="Закрепить заклинание" class="bLockItem"><i aria-hidden="true" class="fa fa-lock"></i></span>
             <span title="Открепить обратно" class="bUnlockItem"><i aria-hidden="true" class="fa fa-unlock-alt"></i></span>
             <h1 title="{{card.title_eng}}" style="font-size: {{card.name_font_size}}px">
-                {{card.circle}}. {{card.name}} {% if card.is_ritual %}(Ритуал) {% endif %}
+                {% if card.circle >= 0 %}{{card.circle}}. {% endif %}{{card.name}} {% if card.is_ritual %}(Ритуал) {% endif %}
             </h1>
-            {% if card.is_face_side %}
+            {% if card.is_face_side and not card.is_ability %}
                 <div class="row">
                     <div contenteditable="true" class="cell">
                         <b>Накладывание</b>

@@ -67,12 +67,13 @@ class Card(models.Model):
 
 class Spell(Card):
     style = 'Default'
-    circle = models.IntegerField(choices=Circle.choices)
+    is_ability = models.BooleanField(default=False)
+    circle = models.IntegerField(choices=Circle.choices, blank=True, null=True)
     is_ritual = models.BooleanField(default=False)
-    cast_time = models.ForeignKey('CastTime', on_delete=models.CASCADE)
-    distance = models.ForeignKey('Distance', on_delete=models.CASCADE)
-    components = models.TextField(choices=Component.choices)
-    duration = models.ForeignKey('Duration', on_delete=models.CASCADE)
+    cast_time = models.ForeignKey('CastTime', on_delete=models.CASCADE, blank=True, null=True)
+    distance = models.ForeignKey('Distance', on_delete=models.CASCADE, blank=True, null=True)
+    components = models.TextField(choices=Component.choices, blank=True, null=True)
+    duration = models.ForeignKey('Duration', on_delete=models.CASCADE, blank=True, null=True)
     material_component = models.CharField(max_length=100, null=True, blank=True)
     classes = models.ManyToManyField('DndClass', blank=True)
     subclasses = models.ManyToManyField('Subclass', blank=True)

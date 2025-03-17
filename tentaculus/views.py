@@ -23,11 +23,13 @@ def all_cards(request):
 
     form = SearchForm(request.GET)
 
-    spells = Spell.objects.prefetch_related('school').order_by('circle', 'name')[:50]
+    spells = Spell.objects.filter(is_ability=False).prefetch_related('school').order_by('circle', 'name')[:27]
     for spell in spells:
         spell.get_school = spell.school.order_by('priority')[0]
 
-    cards = list(spells) + list(Item.objects.order_by('name')[:50])
+    abilities = Spell.objects.filter(is_ability=True).order_by('name')[:27]
+
+    cards = list(spells) + list(Item.objects.order_by('name')[:27]) + list(abilities)
 
     context = {
         'cards': cards,
@@ -37,16 +39,6 @@ def all_cards(request):
     return render(request, 'tentaculus/main.html', context)
 
 
-def cards_block(request):
-    context = get_cards_info(request)
-    if request.GET.get('locked_to_print'):
-        template_name = 'tentaculus/locked_cards.html'
-    else:
-        template_name = 'tentaculus/cards.html'
-
-    return render(request, template_name, context)
-
-
 def all_spells(request):
     """
     Все заклинания
@@ -54,7 +46,25 @@ def all_spells(request):
 
     form = SearchForm(request.GET, initial={'circle_to': Circle.NINTH})
 
-    spells = Spell.objects.filter().select_related('second_side_spell').prefetch_related('school').order_by('circle', 'name')[:100]
+    spells = Spell.objects.filter(is_ability=False).select_related('second_side_spell').prefetch_related('school').order_by('circle', 'name')[:100]
+    for spell in spells:
+        spell.get_school = spell.school.order_by('priority')[0]
+    context = {
+        'cards': spells,
+        'form': form,
+        'convert_form': ConvertFileForm(),
+    }
+    return render(request, 'tentaculus/main.html', context)
+
+
+def all_abilities(request):
+    """
+    Все способности
+    """
+
+    form = SearchForm(request.GET, initial={'circle_to': Circle.NINTH})
+
+    spells = Spell.objects.filter(is_ability=True).order_by('name')[:100]
     for spell in spells:
         spell.get_school = spell.school.order_by('priority')[0]
     context = {
@@ -79,6 +89,16 @@ def all_items(request):
         'convert_form': ConvertFileForm(),
     }
     return render(request, 'tentaculus/main.html', context)
+
+
+def cards_block(request):
+    context = get_cards_info(request)
+    if request.GET.get('locked_to_print'):
+        template_name = 'tentaculus/locked_cards.html'
+    else:
+        template_name = 'tentaculus/cards.html'
+
+    return render(request, template_name, context)
 
 
 def search(request):
