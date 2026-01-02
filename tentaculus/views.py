@@ -16,27 +16,27 @@ from pyppeteer import launch
 # Create your views here.
 
 
-def all_cards(request):
+def all_cards(request, from_search = False):
     """
     Вообще все карты
     """
 
     form = SearchForm(request.GET)
 
-    spells = Spell.objects.filter(is_ability=False).prefetch_related('school').order_by('circle', 'name')[:27]
+    spells = Spell.objects.filter(is_ability=False).prefetch_related('school').order_by('circle', 'name')[:20]
     for spell in spells:
         spell.get_school = spell.school.order_by('priority')[0]
 
-    abilities = Spell.objects.filter(is_ability=True).order_by('name')[:27]
+    abilities = Spell.objects.filter(is_ability=True).order_by('name')[:20]
 
-    cards = list(spells) + list(Item.objects.order_by('name')[:27]) + list(abilities)
+    cards = list(spells) + list(Item.objects.order_by('name')[:20]) + list(abilities)
 
     context = {
         'cards': cards,
         'form': form,
         'convert_form': ConvertFileForm(),
     }
-    return render(request, 'tentaculus/main.html', context)
+    return render(request, 'tentaculus/main.html' if not from_search else 'tentaculus/cards.html', context)
 
 
 def all_spells(request):
@@ -46,7 +46,7 @@ def all_spells(request):
 
     form = SearchForm(request.GET, initial={'circle_to': Circle.NINTH})
 
-    spells = Spell.objects.filter(is_ability=False).select_related('second_side_spell').prefetch_related('school').order_by('circle', 'name')[:100]
+    spells = Spell.objects.filter(is_ability=False).select_related('second_side_spell').prefetch_related('school').order_by('circle', 'name')[:20]
     for spell in spells:
         spell.get_school = spell.school.order_by('priority')[0]
     context = {
@@ -64,7 +64,7 @@ def all_abilities(request):
 
     form = SearchForm(request.GET, initial={'circle_to': Circle.NINTH})
 
-    spells = Spell.objects.filter(is_ability=True).order_by('name')[:100]
+    spells = Spell.objects.filter(is_ability=True).order_by('name')[:20]
     for spell in spells:
         spell.get_school = spell.school.order_by('priority')[0]
     context = {
@@ -82,7 +82,7 @@ def all_items(request):
 
     form = SearchForm(request.GET)
 
-    items = Item.objects.filter().order_by('name')[:100]
+    items = Item.objects.filter().order_by('name')[:20]
     context = {
         'cards': items,
         'form': form,
@@ -105,6 +105,9 @@ def search(request):
     """
     Поиск
     """
+    if not request.GET.get('name') and not request.GET.get('dnd_class') and not request.GET.get('race') and request.GET.get('circle_from') == '-1' and request.GET.get('circle_to') == '-1' and request.GET.get('is_ritual') == 'false':
+        return all_cards(request, True)
+
     context = get_cards_info(request)
     return render(request, 'tentaculus/cards.html', context)
 

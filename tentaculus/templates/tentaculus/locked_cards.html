@@ -6,13 +6,18 @@
 			{% for card in locked_cards %}
 				{% if card.style == 'Item' %}
 					{% include "tentaculus/item_card.html" %}
+
+					{% if card.second_side and card.second_side.style == "Item"%}
+						{% include "tentaculus/item_card.html" with card=card.second_side %}
+					{% elif card.second_side %}
+						{% include "tentaculus/spell_card.html" with card=card.second_side %}
+					{% endif %}
 				{% else %}
 					{% include "tentaculus/spell_card.html" %}
-				{% endif %}
-				{% if card.second_side and card.second_side.style == "Item"%}
-					{% include "tentaculus/item_card.html" with card=card.second_side %}
-				{% elif card.second_side %}
-					{% include "tentaculus/spell_card.html" with card=card.second_side %}
+
+					{% if card.second_side %}
+						{% include "tentaculus/spell_card.html" with card=card.second_side second_side_style=card.style %}
+					{% endif %}
 				{% endif %}
 			{% endfor %}
 		</div>

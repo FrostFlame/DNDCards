@@ -1,12 +1,20 @@
 from audioop import reverse
 
 from django import forms
+from django.utils.functional import empty
 
-from tentaculus.models import DndClass, Circle, School, Book, CastTime, Race, SubRace
+from tentaculus.models import DndClass, Circle, School, Book, CastTime, Race, SubRace, SearchType
 
 
 class SearchForm(forms.Form):
     name = forms.CharField(label='Название', max_length=100, required=False)
+    search_type = forms.ChoiceField(
+        label='Что ищем?',
+        initial=SearchType.ALL,
+        choices=SearchType.choices,
+        widget=forms.Select(attrs={'class': 'customSelect', 'style': 'padding: .5em .2em'}),
+        required=False
+    )
     dnd_class = forms.ModelChoiceField(
         label='Класс',
         empty_label='Все',

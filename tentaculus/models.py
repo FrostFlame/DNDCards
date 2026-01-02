@@ -17,6 +17,13 @@ class Circle(models.IntegerChoices):
     NINTH = 9, '9'
 
 
+class SearchType(models.TextChoices):
+    ALL = 'Всё', 'Всё'
+    SPELLS = 'Заклинания', 'Заклинания'
+    ITEMS = 'Предметы', 'Предметы'
+    ABILITIES = 'Способности', 'Способности'
+
+
 class Component(models.TextChoices):
     V = 'В', 'В'
     S = 'С', 'С'
@@ -42,8 +49,8 @@ class Card(models.Model):
 
     title_eng = models.CharField(max_length=100)
     name = models.CharField(max_length=100, unique=True)
-    second_side_spell = models.ForeignKey('Spell', on_delete=models.CASCADE, blank=True, null=True)
-    second_side_item = models.ForeignKey('Item', on_delete=models.CASCADE, blank=True, null=True)
+    second_side_spell = models.ForeignKey('Spell', on_delete=models.SET_NULL, blank=True, null=True)
+    second_side_item = models.ForeignKey('Item', on_delete=models.SET_NULL, blank=True, null=True)
     is_face_side = models.BooleanField(default=True)
     name_font_size = models.DecimalField(default=14, max_digits=4, decimal_places=2)
     font_size = models.DecimalField(default=11.25, max_digits=4, decimal_places=2)
@@ -128,6 +135,9 @@ class Duration(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        return super(Duration, self).save(*args, **kwargs)
 
 
 class Book(models.Model):

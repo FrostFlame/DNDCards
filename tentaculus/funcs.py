@@ -34,12 +34,15 @@ def get_cards_info(request, is_print=False):
     cast_times = data.getlist('cast_times')
     is_ritual = data.get('is_ritual') == 'true'
 
+    source_class = None
+    source_subclass = None
+    source_race = None
+    source_subrace = None
+
     if is_spell(data):
         ### Блок обработки заклинаний
         cards = Spell.objects.filter(is_ability=False, is_face_side=True).select_related('second_side_spell').order_by('circle', 'name').distinct()
 
-        source_class = None
-        source_subclass = None
         if dnd_class:
             ### Если известен только класс, а сабкласс не указан
             filters = Q(classes=dnd_class)
@@ -57,8 +60,6 @@ def get_cards_info(request, is_print=False):
 
             style = class_instance.style
 
-        source_race = None
-        source_subrace = None
         if race:
             ### Если известна только раса, а подраса не указана
             filters = Q(race=race)
@@ -135,7 +136,8 @@ def get_cards_info(request, is_print=False):
         if card.style == 'Default':
             card.style = style
 
-        if is_spell(data):
+        # if is_spell(data):
+        if type(card) == Spell:
             if schools:
                 card.get_school = card.school.filter(id__in=schools).order_by('priority')[0]
             else:
@@ -187,7 +189,7 @@ def get_locked_cards_info(cards_names):
         cards_names = ''
     cards_names = (card_name.strip() for card_name in cards_names.split(', ') if card_name)
     for card_name in cards_names:
-        card_name, style = card_name.split('|')
+        card_name, style = card_name.replace(' (РИТУАЛ)', '').split('|')
         if card_name[0].isdigit():
             card_name = ''.join(card_name.split('. ')[1:])
         card = (

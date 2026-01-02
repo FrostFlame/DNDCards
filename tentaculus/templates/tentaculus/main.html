@@ -12,13 +12,24 @@
 					<button type="submit" class="btn-link bt flexChild"><i aria-hidden="true" class="fa fa-print"></i></button>
 				</div>
 
-				<div class="mediaWidth flexParent">
-					<a href="/spells" title="Spells" class="bt flexChild">
-						<i>Заклинания</i>
-					</a>
-					<a href="/items" title="Items" class="bt flexChild">
-						<i>Предметы</i>
-					</a>
+<!--				<div class="mediaWidth flexParent">-->
+<!--					<a href="/spells" title="Spells" class="bt flexChild">-->
+<!--						<i>Заклинания</i>-->
+<!--					</a>-->
+<!--					<a href="/items" title="Items" class="bt flexChild">-->
+<!--						<i>Предметы</i>-->
+<!--					</a>-->
+<!--				</div>-->
+
+				<div class="mediaWidth">
+					<div id="TypeInput">
+						<label class="filterLabel">{{ form.search_type.label }}</label>
+						<div style="display: flex;">
+							<div class="customSelect">
+								{{ form.search_type }}
+							</div>
+						</div>
+					</div>
 				</div>
 
 				<div class="mediaWidth">
@@ -32,8 +43,8 @@
 					</div>
 				</div>
 
-				<div class="mediaWidth">
-					<div id="ClassSelect">
+				<div class="mediaWidth" id="ClassSelect" style="display: none">
+					<div>
 						<label class="filterLabel">{{ form.dnd_class.label }}</label>
 						<div>
 							{{ form.dnd_class }}
@@ -41,8 +52,8 @@
 					</div>
 				</div>
 
-				<div class="mediaWidth">
-					<div id="SubClassSelect">
+				<div class="mediaWidth" id="SubClassSelect" style="display: none">
+					<div>
 						<label class="filterLabel">{{ form.subclass.label }}</label>
 						<div class="customSelect">
 							{{ form.subclass }}
@@ -50,8 +61,8 @@
 					</div>
 				</div>
 
-				<div class="mediaWidth">
-					<div id="RaceSelect">
+				<div class="mediaWidth" id="RaceSelect" style="display: none">
+					<div>
 						<label class="filterLabel">{{ form.race.label }}</label>
 						<div>
 							{{ form.race }}
@@ -59,8 +70,8 @@
 					</div>
 				</div>
 
-				<div class="mediaWidth">
-					<div id="SubRaceSelect">
+				<div class="mediaWidth" id="SubRaceSelect" style="display: none">
+					<div>
 						<label class="filterLabel">{{ form.subrace.label }}</label>
 						<div class="customSelect">
 							{{ form.subrace }}
@@ -68,7 +79,7 @@
 					</div>
 				</div>
 
-				<div class="mediaWidth">
+				<div class="mediaWidth" id="CirclesSelects" style="display: none">
 					<label class="filterLabel">Уровень с/по</label>
 					<div class="row">
 						<div class="cell">
@@ -88,7 +99,7 @@
 					</div>
 				</div>
 
-				<div class="mediaWidth">
+				<div class="mediaWidth" id="SchoolsSelect" style="display: none">
 					<div data-text="Школы" class="combo_box">
 						<div id="schools_label" class="combo_box_title">{{form.schools.label}}</div>
 						<div id="schools" class="combo_box_content" style="display: none;">
@@ -107,7 +118,7 @@
 					</div>
 				</div>
 
-				<div class="mediaWidth">
+				<div class="mediaWidth" id="BooksSelect" style="display: none">
 					<div data-text="Книги" class="combo_box">
 						<div id="books_label" class="combo_box_title">{{form.books.label}}</div>
 						<div id="books" class="combo_box_content" style="display: none;">
@@ -126,7 +137,7 @@
 					</div>
 				</div>
 
-				<div class="mediaWidth">
+				<div class="mediaWidth" id="CastTimesSelect" style="display: none">
 					<div data-text="Время накладывания" class="combo_box">
 						<div id="cast_times_label" class="combo_box_title">{{form.cast_times.label}}</div>
 						<div id="cast_times" class="combo_box_content" style="display: none">
@@ -145,8 +156,8 @@
 					</div>
 				</div>
 
-				<div class="mediaWidth">
-					<div id="RitualCheckbox" class="customCheckbox">
+				<div class="mediaWidth" id="RitualCheckbox" style="display: none">
+					<div class="customCheckbox">
 						{{form.is_ritual}}
 						<span class="label">{{form.is_ritual.label}}</span>
 					</div>
@@ -191,6 +202,72 @@
 	</div>
 	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 	<script>
+		$("#id_search_type").change(function () {
+			var search_type = $(this).val();
+
+			let spell_fields = ['ClassSelect', 'SubClassSelect', 'RaceSelect', 'SubRaceSelect', 'CirclesSelects', 'SchoolsSelect', 'BooksSelect', 'CastTimesSelect', 'RitualCheckbox'];
+			let item_fields = ['BooksSelect'];
+			let ability_fields = ['ClassSelect', 'SubClassSelect', 'RaceSelect', 'SubRaceSelect', 'BooksSelect'];
+
+			switch (search_type) {
+				case "Заклинания":
+					for (let i = 0; i < item_fields.length; i++) {
+						document.getElementById(item_fields[i]).style.display = 'none';
+					}
+					for (let i = 0; i < ability_fields.length; i++) {
+						document.getElementById(ability_fields[i]).style.display = 'none';
+					}
+					for (let i = 0; i < spell_fields.length; i++) {
+						document.getElementById(spell_fields[i]).style.display = 'block';
+					}
+					break;
+				case "Предметы":
+					for (let i = 0; i < spell_fields.length; i++) {
+						document.getElementById(spell_fields[i]).style.display = 'none';
+					}
+					for (let i = 0; i < ability_fields.length; i++) {
+						document.getElementById(ability_fields[i]).style.display = 'none';
+					}
+					for (let i = 0; i < item_fields.length; i++) {
+						document.getElementById(item_fields[i]).style.display = 'block';
+					}
+					break;
+				case "Способности":
+					for (let i = 0; i < spell_fields.length; i++) {
+						document.getElementById(spell_fields[i]).style.display = 'none';
+					}
+					for (let i = 0; i < item_fields.length; i++) {
+						document.getElementById(item_fields[i]).style.display = 'none';
+					}
+					for (let i = 0; i < ability_fields.length; i++) {
+						document.getElementById(ability_fields[i]).style.display = 'block';
+					}
+					break;
+				case "Всё":
+					for (let i = 0; i < spell_fields.length; i++) {
+						document.getElementById(spell_fields[i]).style.display = 'none';
+					}
+					for (let i = 0; i < item_fields.length; i++) {
+						document.getElementById(item_fields[i]).style.display = 'none';
+					}
+					for (let i = 0; i < ability_fields.length; i++) {
+						document.getElementById(ability_fields[i]).style.display = 'none';
+					}
+					break;
+			}
+
+<!--			$.ajax({-->
+<!--				url: '/ajax-subclasses',-->
+<!--				data: {-->
+<!--					'class': classId-->
+<!--				},-->
+<!--				success: function (data) {-->
+<!--					$("#id_subclass").html(data);-->
+<!--				}-->
+<!--			});-->
+
+		});
+
 		$("#id_dnd_class").change(function () {
 			var classId = $(this).val();
 			$("#id_subclass").val("");
@@ -207,7 +284,6 @@
 
 		});
 
-		<!--		function ajax_search() {-->
 		let ids = "#id_name, #id_dnd_class, #id_subclass, #id_race, #id_subrace, #id_circle_from, #id_circle_to"
 
 		var children = $("#schools").children();
@@ -268,8 +344,6 @@
 				}
 			});
 		});
-<!--		}-->
-<!--		ajax_search();-->
 
 		$("#id_race").change(function () {
 			var raceId = $(this).val();

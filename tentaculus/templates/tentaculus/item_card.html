@@ -23,7 +23,7 @@
                     </div>
                 {% endif %}
             {% endif %}
-            <div contenteditable="true" class="text" style="font-size: {{card.font_size}}px;">
+            <div contenteditable="true" class="text" style="font-size: {{card.font_size}}px; overflow: hidden">
                 <p>
                     {{card.description|safe}}
                 </p>

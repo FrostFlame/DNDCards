@@ -1,5 +1,6 @@
 import re
 from abc import ABC, abstractmethod
+from PIL import ImageFont
 
 from tentaculus.models import Spell, Book, Component, DndClass, SubClass, Race, SubRace, School, CastTime, Distance, \
     Duration, Item, Attunement, ItemType, Rarity, ItemRequirements
@@ -11,7 +12,9 @@ class FileConverter(ABC):
 
         self.title_eng = None
         self.name = None
-        self.description = None
+        self.description_1 = None
+        self.description_2 = None
+        self.description_font_size = None
         self.book = None
 
         with open(self.path, 'r+', encoding='utf-8') as file:
@@ -85,7 +88,133 @@ class FileConverter(ABC):
         except Exception:
             raise ValueError('Ошибка в описании')
 
-        self.description = description
+        self.description_1 = description
+
+    def split_text_for_cards(self, is_item=False):
+        font_size = 12
+        line_height_multiplier = 1.08333333333
+        font_path_normal = 'arial.ttf'
+        font_path_bold = 'arialbd.ttf'
+        remaining_lines = 'filled'
+        max_width_px = 215
+        max_height_px = 200
+        max_height_px_second_card = 290
+
+        max_lines_fit_mapper = {
+            12: 16,
+            11: 18,
+            10: 20,
+        }
+
+        wrapped_lines = []
+        current_line = ""
+        current_width = 0
+
+        extra_lines = 0
+
+        if hasattr(self, 'material_components') and self.material_components:
+            font_materials = ImageFont.truetype(font_path_normal, 10)
+            words = self.material_components.split(' ')
+            for j, word in enumerate(words):
+                if j > 0:
+                    word = " " + word
+                word_width = font_materials.getlength(word)
+
+                if current_width + word_width <= max_width_px:
+                    current_line += word
+                    current_width += word_width
+                else:
+                    wrapped_lines.append(current_line)
+                    current_line = word.strip()
+                    current_width = font_materials.getlength(current_line.strip('<b>').strip('</b>'))
+
+            if current_line:
+                wrapped_lines.append(current_line)
+
+            extra_lines = len(wrapped_lines)
+
+        while remaining_lines:
+            if font_size < 9:
+                raise ValueError(f"Слишком много текста, шрифт уже меньше 9")
+
+            try:
+                font_normal = ImageFont.truetype(font_path_normal, font_size)
+                font_bold = ImageFont.truetype(font_path_bold, font_size)
+            except IOError as e:
+                raise ValueError(f"Ошибка: файл шрифта не найден: {e}")
+
+            segments = re.split(r'(<b>.*?</b>)', self.description_1)
+            calculated_line_height = font_size * line_height_multiplier
+
+            max_lines_fit = max_lines_fit_mapper.get(font_size) - extra_lines
+            if is_item:
+                max_lines_fit += 2
+            max_lines_fit_second_card = int(max_height_px_second_card / calculated_line_height)
+
+            wrapped_lines = []
+            current_line = ""
+            current_width = 0
+
+            for segment in segments:
+                is_bold = segment.startswith('<b>') and segment.endswith('</b>')
+                text_content = segment
+                sub_segments = text_content.split('<br><br>')
+
+                for i, sub_seg in enumerate(sub_segments):
+                    if i > 0:
+                        wrapped_lines.append(current_line)
+                        wrapped_lines.append("<br><br>")
+                        current_line = ""
+                        current_width = 0
+
+                    words = sub_seg.split(' ')
+                    for j, word in enumerate(words):
+                        if j > 0:
+                            word = " " + word
+                        font_to_use = font_bold if is_bold else font_normal
+                        word_width = font_to_use.getlength(word.strip('<b>').strip('</b>'))
+
+                        if current_width + word_width <= max_width_px:
+                            current_line += word
+                            current_width += word_width
+                        else:
+                            wrapped_lines.append(current_line)
+                            current_line = word.strip()
+                            current_width = font_to_use.getlength(current_line.strip('<b>').strip('</b>'))
+
+            if current_line:
+                wrapped_lines.append(current_line)
+
+            if wrapped_lines and wrapped_lines[-1] == "":
+                wrapped_lines.pop()
+
+            first_card_lines = wrapped_lines[:max_lines_fit]
+            second_card_lines = wrapped_lines[max_lines_fit:max_lines_fit + max_lines_fit_second_card]
+            remaining_lines = wrapped_lines[max_lines_fit + max_lines_fit_second_card:]
+
+            if first_card_lines[-1] == '<br><br>':
+                first_card_lines.pop(-1)
+
+            if second_card_lines and second_card_lines[0] == '<br><br>':
+                second_card_lines.pop(0)
+
+            if second_card_lines and len(second_card_lines) <= 3:
+                remaining_lines = 'filled'
+
+            if remaining_lines:
+                font_size -= 1
+
+        if re.findall(r'<b>(?!.*?</b>).*$', first_card_lines[-1]):
+            first_card_lines[-1] += '</b>'
+            second_card_lines[0] = '<b>' + second_card_lines[0]
+
+        # Чтобы получить плоский текст для последующего расчета:
+        part1 = " ".join(first_card_lines)
+        part2 = " ".join(second_card_lines)
+
+        self.description_1 = part1
+        self.description_2 = part2
+        self.description_font_size = font_size
 
     def set_book(self):
         try:
@@ -132,13 +261,14 @@ class SpellConverter(FileConverter):
 
         self.clear_text()
 
+        self.set_material_components()
         self.set_description()
+        self.split_text_for_cards()
         self.set_book()
         self.set_is_ritual()
         self.set_cast_time()
         self.set_distance()
         self.set_components()
-        self.set_material_components()
         self.set_duration()
         self.set_classes()
         self.set_races()
@@ -154,13 +284,16 @@ class SpellConverter(FileConverter):
             'components': self.components,
             'material_component': self.material_components,
             'duration': self.duration,
+            'description': self.description_1,
+            'font_size': self.description_font_size,
+            'is_face_side': True,
         }
 
-        if not Spell.objects.filter(is_ability=False, title_eng=self.title_eng, name=self.name, second_side_spell__isnull=False).exists():  # noqa
-            defaults['description'] = self.description
+        # if not Spell.objects.filter(is_ability=False, title_eng=self.title_eng, name=self.name, second_side_spell__isnull=False).exists():  # noqa
+        #     defaults['description'] = self.description
 
-        spell, created = Spell.objects.update_or_create(  # noqa
-            title_eng=self.title_eng,
+
+        spell, _ = Spell.objects.update_or_create(  # noqa
             name=self.name,
             defaults=defaults
         )
@@ -175,6 +308,34 @@ class SpellConverter(FileConverter):
         spell.race.add(*self.races)
         spell.subrace.clear()
         spell.subrace.add(*self.subraces)
+
+        if self.description_2:
+            defaults['name'] = self.name + '*'
+            defaults['description'] = self.description_2
+            defaults['is_face_side'] = False
+            second_side, _ = Spell.objects.update_or_create(  # noqa
+                title_eng=self.title_eng,
+                name=self.name + '*',
+                defaults=defaults
+            )
+
+            second_side.school.clear()
+            second_side.school.add(*self.schools)
+            second_side.classes.clear()
+            second_side.classes.add(*self.classes)
+            second_side.subclasses.clear()
+            second_side.subclasses.add(*self.subclasses)
+            second_side.race.clear()
+            second_side.race.add(*self.races)
+            second_side.subrace.clear()
+            second_side.subrace.add(*self.subraces)
+
+            spell.second_side_spell = second_side
+            spell.save()
+
+        if not self.description_2 and spell.second_side:
+            second_side = spell.second_side
+            second_side.delete()
 
         return ''
 
@@ -270,15 +431,19 @@ class SpellConverter(FileConverter):
                     raise ValueError(f'Обнаружен новый класс: {dnd_class}\n')
 
     def set_subclasses(self):
-        subclasses = re.findall(r'Архетипы: .*\n', self.text.replace('<b>', '').replace('</b>', ''))
-        if subclasses:
-            subclasses_str = re.findall(r'.*?#.*?\|(.*?) \(', subclasses[0])
-            for subclass in subclasses_str:
-                try:
-                    subclass = SubClass.objects.get(name__iexact=subclass)  # noqa
-                    self.subclasses.append(subclass)
-                except SubClass.DoesNotExist as e:  # noqa
-                    raise ValueError(f'Обнаружен новый сабкласс: {subclass}\n')
+        all_subclasses = re.findall(r'<td>Архетипы.*</td>', self.text, re.DOTALL)
+        if not all_subclasses:
+            return
+        all_subclasses = all_subclasses[0].replace('<td>', '').replace('</td>', '').split('\n')[1:]
+        classes = re.findall(r'<th>Классы.*</th>', self.text, re.DOTALL)[0].replace('<th>', '').replace('</th>', '').split('\n')[1:]
+        if all_subclasses:
+            for dnd_class, class_subclasses in zip(classes, all_subclasses):
+                for subclass in class_subclasses.split('<br>'):
+                    try:
+                        subclass = SubClass.objects.get(name__iexact=subclass)  # noqa
+                        self.subclasses.append(subclass)
+                    except SubClass.DoesNotExist as e:  # noqa
+                        raise ValueError(f'Обнаружен новый сабкласс: {dnd_class}|{subclass}\n')
 
     def set_races(self):
         races_str = re.findall(r'Расы: (.*)', self.text.replace('<b>', '').replace('</b>', ''))
@@ -307,9 +472,6 @@ class SpellConverter(FileConverter):
 class ItemConverter(FileConverter):
     def __init__(self, path):
         super().__init__(path)
-        self.text = self.text.replace(
-            'Длительность: **Мгновенная**', 'Длительность: **Мгновенно**'
-        )
 
         self.attunement = None
         self.item_type = None
@@ -326,6 +488,7 @@ class ItemConverter(FileConverter):
 
         self.set_attunement()
         self.set_description()
+        self.split_text_for_cards(is_item=True)
         self.set_book()
         self.set_item_type()
         self.set_rarity()
@@ -339,16 +502,35 @@ class ItemConverter(FileConverter):
             'item_type': self.item_type,
             'rarity': self.rarity,
             'requirements': self.requirements,
+            'description': self.description_1,
+            'font_size': self.description_font_size,
+            'is_face_side': True,
         }
 
-        if not Item.objects.filter(title_eng=self.title_eng, name=self.name, second_side_spell__isnull=False).exists():  # noqa
-            defaults['description'] = self.description
+        # if not Item.objects.filter(title_eng=self.title_eng, name=self.name, second_side_spell__isnull=False).exists():  # noqa
+        #     defaults['description'] = self.description_1
 
         item, created = Item.objects.update_or_create(  # noqa
-            title_eng=self.title_eng,
             name=self.name,
             defaults=defaults
         )
+
+        if self.description_2:
+            defaults['name'] = self.name + '*'
+            defaults['description'] = self.description_2
+            defaults['is_face_side'] = False
+            second_side, _ = Item.objects.update_or_create(  # noqa
+                title_eng=self.title_eng,
+                name=self.name + '*',
+                defaults=defaults
+            )
+
+            item.second_side_item = second_side
+            item.save()
+
+        if not self.description_2 and item.second_side_item:
+            second_side = item.second_side
+            second_side.delete()
 
         return ''
 
@@ -372,7 +554,7 @@ class ItemConverter(FileConverter):
 
     def set_item_type(self):
         try:
-            item_type = re.findall(r'(.*),', self.text)[0]
+            item_type = re.findall(r'(.*),', self.text)[0].strip('<b>').strip('</b>')
         except Exception:
             raise ValueError('Не обнаружен тип предмета')
         try:
@@ -382,16 +564,16 @@ class ItemConverter(FileConverter):
 
     def set_rarity(self):
         try:
-            rarity = re.findall(r', .*', self.text)[0]
+            rarity = re.findall(r', \*\*.*?\*\*', self.text)[0].strip(', ').strip('**')
         except:
             raise ValueError('Не обнаружена редкость')
 
         for r in Rarity:
-            if r in rarity:
+            if r.lower() == rarity.lower():
                 self.rarity = r
                 return
 
-        raise ValueError(f'Обнаружена некорректная редкость\n')
+        raise ValueError(f'Обнаружена некорректная редкость {rarity}\n')
 
     def set_requirements(self):
         try:
