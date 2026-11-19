@@ -158,7 +158,7 @@ async def get_pdf(request, pdf_orientation):
     Генерация pdf
     """
     url = (
-        f'http://127.0.0.1:8000/cards_block?'
+        f'http://127.0.0.1:8080/cards_block?'
         f'name={request.GET.get("name")}'
         f'&dnd_class={request.GET.get("dnd_class")}'
         f'&subclass={request.GET.get("subclass")}'

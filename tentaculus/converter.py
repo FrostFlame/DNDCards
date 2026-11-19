@@ -74,7 +74,6 @@ class FileConverter(ABC):
                 .replace('d', 'к')
                 .replace('<br>- ', '<br>• ')
                 .replace('На больших уровнях', '<i>НБУ</i>')
-                .replace('_', '')
                 .split('**')
             )
             description = ''
@@ -85,8 +84,20 @@ class FileConverter(ABC):
                         description += '<b>'
                 else:
                     description += '</b>'
+
+            description_split = re.split('[*|_]', description)
+            description = ''
+            for i, string in enumerate(description_split):
+                description += string
+                if i % 2 == 0:
+                    if i != len(description_split) - 1:
+                        description += '<i>'
+                else:
+                    description += '</i>'
         except Exception:
             raise ValueError('Ошибка в описании')
+
+        description = description.replace('</br> <br>', ' ')
 
         self.description_1 = description
 
@@ -220,7 +231,7 @@ class FileConverter(ABC):
         try:
             book = re.findall(r'Источник.*?:\s«(.*)»', self.text)[0]
         except Exception:
-            raise ValueError('Не обнаружена книга')
+            raise ValueError(f'Не обнаружена книга')
         try:
             self.book = Book.objects.get(title_eng=book)  # noqa
         except Book.DoesNotExist as e:  # noqa
@@ -536,11 +547,11 @@ class ItemConverter(FileConverter):
 
     def set_attunement(self):
         try:
-            attunement = re.findall(r'\(требуется \*\*настройка\*\*.*\)', self.text)
+            attunement = re.findall(r'\(требуется \*\*(настройка.*)\*\*\)', self.text)
             if not attunement:
                 attunement = 'Нет'
             else:
-                attunement = attunement[0].strip('(').strip(')').split('**настройка**')
+                attunement = attunement[0].strip('(').strip(')').split('настройка')
                 if not attunement[1]:
                     attunement = 'Да'
                 else:
